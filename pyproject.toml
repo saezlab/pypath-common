@@ -80,7 +80,7 @@ length_sort = "1"
 indent = "    "
 
 [tool.flake8]
-ignore = ["D200", "D202", "D401"]
+ignore = ["D200", "D202", "D401", "D105"]
 per-file-ignores = [
     "docs/source/conf.py:D100",
     "tests/*:D100,D101,D102"

@@ -81,7 +81,9 @@ def new_logger(
 
 class Logger:
     """
-    Base class that makes logging available for its descendants.
+    Core logger implementation.
+
+    Bound to one log file but used by many instances of various objects.
     """
 
     strftime = time.strftime
@@ -95,7 +97,7 @@ class Logger:
         max_width: int = 200,
     ):
         """
-        Make this instance a logger.
+        Create a new logger.
 
         Args:
             fname:
