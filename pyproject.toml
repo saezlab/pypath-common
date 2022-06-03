@@ -28,6 +28,7 @@ readme = "README.rst"
 
 [tool.poetry.dependencies]
 python = ">=3.7"
+timeloop = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=6.0"
