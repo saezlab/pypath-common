@@ -29,6 +29,8 @@ import traceback
 
 from pypath_common import _logger
 
+__all__ = ["Session", "Logger"]
+
 
 class Session:
     """

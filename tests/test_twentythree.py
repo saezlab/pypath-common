@@ -1,10 +1,10 @@
 import pypath_common
 
 
-class Test23:
-    def test_twentythree(self):
+class TestSession:
+    def test_session_id(self):
         """
-        The number 23.
+        This is a stupid test, just wanna have it here as a placeholder.
         """
 
-        assert pypath_common.twentythree() == 23
+        assert len(pypath_common.Session.gen_session_id(10)) == 10
