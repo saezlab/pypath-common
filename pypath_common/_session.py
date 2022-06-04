@@ -21,7 +21,7 @@
 #  Website: http://pypath.omnipathdb.org/
 #
 
-from typing import Optional
+from typing import Union, Optional
 import sys
 import random
 import itertools
@@ -29,7 +29,9 @@ import traceback
 
 from pypath_common import _logger
 
-__all__ = ["Session", "Logger"]
+__all__ = ["Session", "Logger", "get_session", "new_session", "get_log"]
+
+SESSIONS = globals().get("SESSIONS", {})
 
 
 class Session:
@@ -37,20 +39,35 @@ class Session:
     Session manager.
     """
 
-    def __init__(self, label: Optional[str] = None, log_verbosity: int = 0):
+    def __init__(
+        self,
+        module: Optional[str] = None,
+        label: Optional[str] = None,
+        log_verbosity: int = 0,
+        logdir: Optional[str] = None,
+        config: Optional[Union[dict, str]] = None,
+    ):
         """
         Start a new session.
 
         Args:
+            module:
+                Name of the module the session belongs to.
             label:
                 Name of the session. If not provided, a random string will be
                 used.
             log_verbosity:
                 Default log verbosity for the session.
+            logdir:
+                Directory for log files.
+            config:
+                Path to the config file or config as a dict.
         """
 
+        self.module = _get_module(module)
         self.label = label or self.gen_session_id()
         self.log_verbosity = log_verbosity
+        self.logdir = logdir
         self.start_logger()
         self.log.msg("Session `%s` started." % self.label)
 
@@ -77,8 +94,13 @@ class Session:
         Creates a logger for this session which will be served to all modules.
         """
 
-        self.logfile = "pypath-%s.log" % self.label
-        self.log = _logger.Logger(self.logfile, verbosity=self.log_verbosity)
+        self.logfile = f"{self.module}-{self.label}.log"
+        self.logdir = self.logdir or "%s_log" % self.module
+        self.log = _logger.Logger(
+            fname=self.logfile,
+            logdir=self.logdir,
+            verbosity=self.log_verbosity,
+        )
 
     def finish_logger(self):
         """
@@ -180,45 +202,81 @@ class Logger:
             self._log(traceline)
 
 
-def get_session():
+def _get_module(module: Optional[str] = None, level: int = 2) -> str:
+    """
+    The module some frames above.
+
+    Should be called from a function that is called directly from the
+    client module.
+
+    Args:
+        module:
+            Override the name of the module instead of getting it from
+            some parent frame.
+        level:
+            How many frames above get the module from.
+
+    Returns:
+        The name of the module of the caller ``level`` frames above.
+    """
+
+    return module or sys._getframe(level).f_back.f_globals["__name__"]
+
+
+def get_session(module: Optional[str] = None, **kwargs) -> Session:
     """
     Create new session or return the one already created.
+
+    Args:
+        module:
+            Name of the module the session belongs to.
+        kawrgs:
+            Passed to `Session`.
+
+    Returns:
+        The session of the module.
     """
 
-    mod = sys.modules[__name__]
+    module = _get_module(module)
 
-    if not hasattr(mod, "session"):
+    if module not in SESSIONS:
 
-        new_session()
+        new_session(module=module, **kwargs)
 
-    return sys.modules[__name__].session
+    return SESSIONS[module]
 
 
-def get_log():
+def get_log(module: Optional[str] = None) -> Logger:
     """
-    Get the ``Logger`` instance belonging to the session.
+    Get the ``Logger`` instance of the session.
+
+    Args:
+        module:
+            Name of the module the session belongs to.
+
+    Returns:
+        The Logger instance of the session.
     """
 
-    return get_session().log
+    module = _get_module(module)
+
+    return get_session(module=module).log
 
 
-def new_session(label: Optional[str] = None, log_verbosity: int = 0):
+def new_session(
+    module: str,
+    **kwargs,
+):
     """
     Create a new session.
 
     In case a session already exists it will be deleted.
 
     Args:
-        label:
-            A custom name for the session.
-        log_verbosity:
-            Verbosity level passed to the logger.
+        module:
+            Name of the module the session belongs to.
+        kwargs:
+            Passed to `Session`.
     """
 
-    mod = sys.modules[__name__]
-
-    if hasattr(mod, "session"):
-
-        delattr(mod, "session")
-
-    mod.session = Session(label, log_verbosity)
+    SESSIONS[module] = Session(module, **kwargs)
