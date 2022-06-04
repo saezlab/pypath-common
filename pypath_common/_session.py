@@ -27,9 +27,9 @@ import random
 import itertools
 import traceback
 
-from pypath_common import _logger
+from pypath_common import _logger, _settings
 
-__all__ = ["Session", "Logger", "get_session", "new_session", "get_log"]
+__all__ = ["Session", "Logger", "session", "new_session", "log", "config"]
 
 SESSIONS = globals().get("SESSIONS", {})
 
@@ -46,6 +46,7 @@ class Session:
         log_verbosity: int = 0,
         logdir: Optional[str] = None,
         config: Optional[Union[dict, str]] = None,
+        **kwargs,
     ):
         """
         Start a new session.
@@ -62,12 +63,22 @@ class Session:
                 Directory for log files.
             config:
                 Path to the config file or config as a dict.
+            kwargs:
+                Configuration key-value pairs.
         """
 
         self.module = _get_module(module)
         self.label = label or self.gen_session_id()
         self.log_verbosity = log_verbosity
         self.logdir = logdir
+
+        config_fname = config if isinstance(config, str) else None
+        config_dict = None if config_fname else config
+
+        self.config = _settings.Settings(
+            fname=config_fname, module=self.module, _dict=config_dict, **kwargs
+        )
+
         self.start_logger()
         self.log.msg("Session `%s` started." % self.label)
 
@@ -120,6 +131,50 @@ class Session:
 
             self.log.msg("Session `%s` finished." % self.label)
 
+    def get(self, param, override=None):
+        """
+        The current value of a settings parameter.
+
+        Args:
+            param (str): Name of a parameter.
+            override: Override the currently valid settings,
+                return this value instead.
+            default: If no value is set up for the key requested,
+                use this default value instead.
+
+        Wrapper of `Settings.get()`.
+        """
+        return self.config.get(param, override=override)
+
+    def setup(self, _dict=None, **kwargs):
+        """
+        Set the values of various parameters in the settings.
+
+        Args:
+            _dict: A `dict` of parameters, keys are the option names, values
+                are the values to be set.
+            kwargs: Alternative way to provide parameters, argument names
+                are the option names, values are the corresponding values.
+
+        Returns:
+            None
+        """
+
+        return self.config.setup(_dict, **kwargs)
+
+    def context(self, _dict: Optional[dict] = None, **kwargs):
+        """
+        Context with altered settings.
+
+        Args:
+            _dict:
+                A dictionary of config key-value pairs.
+            kwargs:
+                Config key-value pairs.
+        """
+
+        return self.config.context(_dict, **kwargs)
+
 
 class Logger:
     """
@@ -136,8 +191,9 @@ class Logger:
                 messages it sends to the logger.
         """
 
+        module = _get_module()
         self._log_name = name or self.__class__.__name__
-        self._logger = get_log()
+        self._logger = log(module=module)
 
     def _log(self, msg="", level=0):
         """
@@ -223,7 +279,7 @@ def _get_module(module: Optional[str] = None, level: int = 2) -> str:
     return module or sys._getframe(level).f_back.f_globals["__name__"]
 
 
-def get_session(module: Optional[str] = None, **kwargs) -> Session:
+def session(module: Optional[str] = None, **kwargs) -> Session:
     """
     Create new session or return the one already created.
 
@@ -246,9 +302,9 @@ def get_session(module: Optional[str] = None, **kwargs) -> Session:
     return SESSIONS[module]
 
 
-def get_log(module: Optional[str] = None) -> Logger:
+def log(module: Optional[str] = None) -> Logger:
     """
-    Get the ``Logger`` instance of the session.
+    Get the `Logger` instance of the session.
 
     Args:
         module:
@@ -260,7 +316,26 @@ def get_log(module: Optional[str] = None) -> Logger:
 
     module = _get_module(module)
 
-    return get_session(module=module).log
+    return session(module=module).log
+
+
+def config(module: Optional[str] = None) -> _settings.Settings:
+    """
+    Get the configuration of a session.
+
+    The config contains user controlled parameters of a module.
+
+    Args:
+        module:
+            Name of the module the session belongs to.
+
+    Returns:
+        A `_settings.Settings` instance.
+    """
+
+    module = _get_module(module)
+
+    return session(module=module).config
 
 
 def new_session(
