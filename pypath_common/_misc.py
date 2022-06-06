@@ -935,6 +935,8 @@ def dict_sym_diff(d1: dict, d2: dict) -> dict:  # XXX: Not used
         elif type(d1[k]) is set and type(d2[k]) is set:
             diff[k] = d1[k] ^ d2[k]
 
+    a = 1 + 1  # noqa: F841
+
     return diff
 
 
@@ -1796,7 +1798,7 @@ def combine_attrs(attrs: list[Any], num_method: Callable = max) -> Any:
         * Numbers: returns the greater by default or calls
           *num_method* if given.
         * Sets: returns the union.
-        * Dictionaries: calls :py:func:`pypath.common.merge_dicts`.
+        * Dictionaries: calls :py:func:`pypath_common.misc.merge_dicts`.
         * Direction: calls their special
           :py:meth:`pypath.main.Direction.merge` method.
 
