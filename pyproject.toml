@@ -29,6 +29,8 @@ readme = "README.rst"
 [tool.poetry.dependencies]
 python = ">=3.7"
 timeloop = "*"
+tabulate = "*"
+numpy = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=6.0"
@@ -80,7 +82,7 @@ length_sort = "1"
 indent = "    "
 
 [tool.flake8]
-ignore = ["D200", "D202", "D401", "D105"]
+ignore = ["D200", "D202", "D401", "D105", "W504"]
 per-file-ignores = [
     "docs/source/conf.py:D100",
     "tests/*:D100,D101,D102",
@@ -88,3 +90,14 @@ per-file-ignores = [
 ]
 max-line-length = 80
 count = true
+
+[tool.yapf]
+based_on_style = "facebook"
+split_penalty_before_if_expr = 0
+split_penalty_import_names = 0
+split_penalty_comprehension = 0
+split_penalty_for_added_line_split = 0
+split_penalty_after_opening_bracket = 0
+split_before_first_argument = true
+split_before_named_assigns = true
+split_complex_comprehension = true

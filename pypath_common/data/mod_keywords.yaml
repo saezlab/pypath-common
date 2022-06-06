@@ -1,0 +1,205 @@
+ACSN:
+- !!python/tuple
+    -   phosphorylation
+    -   -   phospho
+- !!python/tuple
+    -   glycylation
+    -   -   glycyl
+- !!python/tuple
+    -   ubiquitination
+    -   -   ubiquitin
+- !!python/tuple
+    -   acetylation
+    -   -   acetyl
+- !!python/tuple
+    -   myristoylation
+    -   -   myristoyl
+- !!python/tuple
+    -   prenylation
+    -   -   prenyl
+- !!python/tuple
+    -   hydroxylation
+    -   -   hydroxy
+KEGG:
+- !!python/tuple
+    -   phosphorylation
+    -   -   hospho
+- !!python/tuple
+    -   methylation
+    -   -   methyl
+- !!python/tuple
+    -   ubiquitination
+    -   -   ubiquitin
+- !!python/tuple
+    -   acetylation
+    -   -   acetyl
+- !!python/tuple
+    -   hydroxylation
+    -   -   hydroxy
+- !!python/tuple
+    -   carboxyethylation
+    -   -   carboxyethyl
+- !!python/tuple
+    -   ribosylation
+    -   -   ribosyl
+- !!python/tuple
+    -   nitrosylation
+    -   -   nitrosyl
+- !!python/tuple
+    -   sulfoylation
+    -   -   ulfo
+- !!python/tuple
+    -   biotinylation
+    -   -   biotinyl
+- !!python/tuple
+    -   malonylation
+    -   -   malonyl
+- !!python/tuple
+    -   glutarylation
+    -   -   lutaryl
+NCI-PID:
+- !!python/tuple
+    -   phosphorylation
+    -   -   phospho
+- !!python/tuple
+    -   methylation
+    -   -   methyl
+- !!python/tuple
+    -   farnesylation
+    -   -   farnesyl
+- !!python/tuple
+    -   palmitoylation
+    -   -   palmito
+- !!python/tuple
+    -   myristoylation
+    -   -   myristoyl
+- !!python/tuple
+    -   glycylation
+    -   -   glycyl
+- !!python/tuple
+    -   ubiquitination
+    -   -   ubiquitin
+- !!python/tuple
+    -   acetylation
+    -   -   acetyl
+- !!python/tuple
+    -   glycosylation
+    -   -   glycosyl
+- !!python/tuple
+    -   geranylation
+    -   -   geranyl
+- !!python/tuple
+    -   hydroxylation
+    -   -   hydroxy
+NetPath:
+- !!python/tuple
+    -   phosphorylation
+    -   -   phospho
+- !!python/tuple
+    -   glycylation
+    -   -   glycyl
+- !!python/tuple
+    -   ubiquitination
+    -   -   ubiquitin
+- !!python/tuple
+    -   acetylation
+    -   -   acetyl
+PANTHER:
+- !!python/tuple
+    -   phosphorylation
+    -   -   phospho
+- !!python/tuple
+    -   acetylation
+    -   -   acetyl
+Reactome:
+- !!python/tuple
+    -   phosphopantetheinylation
+    -   -   phosphopantet
+- !!python/tuple
+    -   phosphorylation
+    -   -   phospho
+- !!python/tuple
+    -   acetylneuraminylation
+    -   -   acetylneuraminyl
+- !!python/tuple
+    -   acetylation
+    -   -   acetyl
+- !!python/tuple
+    -   farnesylation
+    -   -   farnesyl
+- !!python/tuple
+    -   palmitoylation
+    -   -   palmito
+- !!python/tuple
+    -   methylation
+    -   -   methyl
+- !!python/tuple
+    -   tetradecanoylation
+    -   -   tetradecanoyl
+- !!python/tuple
+    -   decanoylation
+    -   -   decanoyl
+- !!python/tuple
+    -   palmitoleylation
+    -   -   palmytoleil
+- !!python/tuple
+    -   formylation
+    -   -   formyl
+- !!python/tuple
+    -   ubiquitination
+    -   -   ubiquitin
+- !!python/tuple
+    -   galactosylation
+    -   -   galactos
+- !!python/tuple
+    -   glutamylation
+    -   -   glutamyl
+- !!python/tuple
+    -   fucosylation
+    -   -   fucosyl
+- !!python/tuple
+    -   myristoylation
+    -   -   myristoyl
+- !!python/tuple
+    -   carboxylation
+    -   -   carboxyl
+- !!python/tuple
+    -   biotinylation
+    -   -   biotinyl
+- !!python/tuple
+    -   glycosylation
+    -   -   glycosyl
+- !!python/tuple
+    -   octanoylation
+    -   -   octanoyl
+- !!python/tuple
+    -   glycylation
+    -   -   glycyl
+- !!python/tuple
+    -   hydroxylation
+    -   -   hydroxy
+- !!python/tuple
+    -   sulfhydration
+    -   -   persulfid
+- !!python/tuple
+    -   thiolation
+    -   -   thio
+- !!python/tuple
+    -   amidation
+    -   -   amide
+- !!python/tuple
+    -   selenation
+    -   -   seleno
+- !!python/tuple
+    -   glucosylation
+    -   -   glucosyl
+- !!python/tuple
+    -   neddylation
+    -   -   neddyl
+- !!python/tuple
+    -   sumoylation
+    -   -   sumoyl
+- !!python/tuple
+    -   prenylation
+    -   -   prenyl
+WikiPathways: []

@@ -1,0 +1,51 @@
+- !!python/tuple
+    -   p
+    -   phosphorylation
+- !!python/tuple
+    -   ac
+    -   acetylation
+- !!python/tuple
+    -   ga
+    -   galactosylation
+- !!python/tuple
+    -   gl
+    -   glycosylation
+- !!python/tuple
+    -   ub
+    -   ubiquitination
+- !!python/tuple
+    -   me
+    -   methylation
+- !!python/tuple
+    -   sm
+    -   sumoylation
+- !!python/tuple
+    -   sc
+    -   succinylation
+- !!python/tuple
+    -   m1
+    -   mono-methylation
+- !!python/tuple
+    -   m2
+    -   di-methylation
+- !!python/tuple
+    -   m3
+    -   tri-methylation
+- !!python/tuple
+    -   ad
+    -   adenylation
+- !!python/tuple
+    -   pa
+    -   palmitoylation
+- !!python/tuple
+    -   ne
+    -   neddylation
+- !!python/tuple
+    -   sn
+    -   nitrosylation
+- !!python/tuple
+    -   ca
+    -   caspase-cleavage
+- !!python/tuple
+    -   ng
+    -   n-glycosylation

@@ -1,0 +1,17 @@
+edge:
+-   curved
+-   color
+-   width
+-   arrow_size
+-   arrow_width
+vertex:
+-   size
+-   color
+-   frame_color
+-   frame_width
+-   shape
+-   label
+-   label_dist
+-   label_color
+-   label_size
+-   label_angle

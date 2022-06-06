@@ -1,0 +1,101 @@
+!!python/tuple
+- !!python/tuple
+    -   Ac
+    - !!python/tuple
+        -   acetylation
+- !!python/tuple
+    -   ADPRib
+    - !!python/tuple
+        -   ADP-ribosylation
+        -   ADP-rybosylation
+        -   adenosine diphosphoribosyl
+- !!python/tuple
+    -   Farn
+    - !!python/tuple
+        -   farnesylation
+- !!python/tuple
+    -   Gerger
+    - !!python/tuple
+        -   geranylgeranylation
+- !!python/tuple
+    -   Glyco
+    - !!python/tuple
+        -   glycosylation
+- !!python/tuple
+    -   Hy
+    - !!python/tuple
+        -   hydroxylation
+- !!python/tuple
+    -   ISG
+    - !!python/tuple
+        -   ISGylation
+        -   ISG15-protein conjugation
+- !!python/tuple
+    -   Me
+    - !!python/tuple
+        -   methylation
+- !!python/tuple
+    -   Me1
+    - !!python/tuple
+        -   monomethylation
+        -   mono-methylation
+- !!python/tuple
+    -   Me2
+    - !!python/tuple
+        -   dimethylation
+        -   di-methylation
+- !!python/tuple
+    -   Me3
+    - !!python/tuple
+        -   trimethylation
+        -   tri-methylation
+- !!python/tuple
+    -   Myr
+    - !!python/tuple
+        -   myristoylation
+- !!python/tuple
+    -   Nedd
+    - !!python/tuple
+        -   neddylation
+- !!python/tuple
+    -   NGlyco
+    - !!python/tuple
+        -   N-linked glycosylation
+- !!python/tuple
+    -   OGlyco
+    - !!python/tuple
+        -   O-linked glycosylation
+- !!python/tuple
+    -   Palm
+    - !!python/tuple
+        -   palmitoylation
+- !!python/tuple
+    -   Ph
+    - !!python/tuple
+        -   phosphorylation
+- !!python/tuple
+    -   Sumo
+    - !!python/tuple
+        -   sumoylation
+- !!python/tuple
+    -   Ub
+    - !!python/tuple
+        -   ubiquitination
+        -   ubiquitinylation
+        -   ubiquitylation
+- !!python/tuple
+    -   UbK48
+    - !!python/tuple
+        -   Lysine 48-linked polyubiquitination
+- !!python/tuple
+    -   UbK63
+    - !!python/tuple
+        -   Lysine 63-linked polyubiquitination
+- !!python/tuple
+    -   UbMono
+    - !!python/tuple
+        -   monoubiquitination
+- !!python/tuple
+    -   UbPoly
+    - !!python/tuple
+        -   polyubiquitination

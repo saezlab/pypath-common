@@ -1,0 +1,21 @@
+- !!python/tuple
+    -   p
+    -   phosphorylation
+- !!python/tuple
+    -   ac
+    -   acetylation
+- !!python/tuple
+    -   ga
+    -   galactosylation
+- !!python/tuple
+    -   gl
+    -   glycosylation
+- !!python/tuple
+    -   sm
+    -   sumoylation
+- !!python/tuple
+    -   ub
+    -   ubiquitination
+- !!python/tuple
+    -   me
+    -   methylation

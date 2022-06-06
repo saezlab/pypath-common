@@ -1,0 +1,89 @@
+!!python/tuple
+- !!python/tuple
+    -   alanine
+    -   Ala
+    -   A
+- !!python/tuple
+    -   arginine
+    -   Arg
+    -   R
+- !!python/tuple
+    -   asparagine
+    -   Asn
+    -   N
+- !!python/tuple
+    -   aspartic acid
+    -   Asp
+    -   D
+- !!python/tuple
+    -   asparagine or aspartic acid
+    -   Asx
+    -   B
+- !!python/tuple
+    -   cysteine
+    -   Cys
+    -   C
+- !!python/tuple
+    -   glutamic acid
+    -   Glu
+    -   E
+- !!python/tuple
+    -   glutamine
+    -   Gln
+    -   Q
+- !!python/tuple
+    -   glutamine or glutamic acid
+    -   Glx
+    -   Z
+- !!python/tuple
+    -   glycine
+    -   Gly
+    -   G
+- !!python/tuple
+    -   histidine
+    -   His
+    -   H
+- !!python/tuple
+    -   isoleucine
+    -   Ile
+    -   I
+- !!python/tuple
+    -   leucine
+    -   Leu
+    -   L
+- !!python/tuple
+    -   lysine
+    -   Lys
+    -   K
+- !!python/tuple
+    -   methionine
+    -   Met
+    -   M
+- !!python/tuple
+    -   phenylalanine
+    -   Phe
+    -   F
+- !!python/tuple
+    -   proline
+    -   Pro
+    -   P
+- !!python/tuple
+    -   serine
+    -   Ser
+    -   S
+- !!python/tuple
+    -   threonine
+    -   Thr
+    -   T
+- !!python/tuple
+    -   tryptophan
+    -   Trp
+    -   W
+- !!python/tuple
+    -   tyrosine
+    -   Tyr
+    -   Y
+- !!python/tuple
+    -   valine
+    -   Val
+    -   V
