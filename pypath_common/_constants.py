@@ -35,6 +35,8 @@ __all__ = [
     'SIMPLE_TYPES',
 ]
 
+from typing import Union
+
 NO_VALUE = 'PYPATH_NO_VALUE'
 GLOM_ERROR = 'PYPATH_GLOM_ERROR'
 CURSOR_UP_ONE = '\x1b[1A'
@@ -43,7 +45,7 @@ NOT_ORGANISM_SPECIFIC = -1
 BOOLEAN_TRUE = frozenset(('1', 'yes', 'true'))
 BOOLEAN_FALSE = frozenset(('0', 'no', 'false'))
 BOOLEAN_VALUES = BOOLEAN_TRUE.union(BOOLEAN_FALSE)
-SIMPLE_TYPES = (int, float, str, bytes, bool, type(None))
-NUMERIC_TYPES = (int, float)
-CHAR_TYPES = (str, bytes)
-LIST_LIKE = (tuple, set, list)
+SIMPLE_TYPES = Union[int, float, str, bytes, bool, type(None)]
+NUMERIC_TYPES = Union[int, float]
+CHAR_TYPES = Union[str, bytes]
+LIST_LIKE = Union[tuple, set, list]

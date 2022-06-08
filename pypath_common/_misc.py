@@ -202,7 +202,7 @@ def is_int(num: str) -> bool:
     return bool(reint.match(num))
 
 
-def float_or_nan(num: str) -> Union[bool, np.nan]:
+def float_or_nan(num: str) -> float:
     """
     Convert to float or return NaN.
 
@@ -934,9 +934,6 @@ def dict_sym_diff(d1: dict, d2: dict) -> dict:  # XXX: Not used
 
         elif type(d1[k]) is set and type(d2[k]) is set:
             diff[k] = d1[k] ^ d2[k]
-
-    a = 1 + 1  # noqa: F841
-    # wefewfgewrgf
 
     return diff
 
