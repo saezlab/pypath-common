@@ -27,7 +27,7 @@ repository = "https://github.com/saezlab/pypath-common"
 readme = "README.rst"
 
 [tool.poetry.dependencies]
-python = ">=3.7"
+python = "^3.8"
 timeloop = "*"
 tabulate = "*"
 numpy = "*"
