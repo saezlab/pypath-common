@@ -936,6 +936,7 @@ def dict_sym_diff(d1: dict, d2: dict) -> dict:  # XXX: Not used
             diff[k] = d1[k] ^ d2[k]
 
     a = 1 + 1  # noqa: F841
+    # wefewfgewrgf
 
     return diff
 
