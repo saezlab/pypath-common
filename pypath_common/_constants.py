@@ -42,7 +42,6 @@ from typing import (
     KeysView,
     Mapping,
     ValuesView,
-    Union,
 )
 
 NO_VALUE = 'PYPATH_NO_VALUE'
@@ -53,9 +52,9 @@ NOT_ORGANISM_SPECIFIC = -1
 BOOLEAN_TRUE = frozenset(('1', 'yes', 'true'))
 BOOLEAN_FALSE = frozenset(('0', 'no', 'false'))
 BOOLEAN_VALUES = BOOLEAN_TRUE.union(BOOLEAN_FALSE)
-SIMPLE_TYPES = Union[int, float, str, bytes, bool, type(None)]
-NUMERIC_TYPES = Union[int, float]
-CHAR_TYPES = Union[str, bytes]
+SIMPLE_TYPES = (int, float, str, bytes, bool, type(None))
+NUMERIC_TYPES = (int, float)
+CHAR_TYPES = (str, bytes)
 LIST_LIKE = (
     list,
     set,

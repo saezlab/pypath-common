@@ -20,13 +20,22 @@
 #  Contains helper functions shared by different modules.
 #
 
+from __future__ import annotations
+
+#TODO requires cleaning, check what functions are not used and may be removed.
+#Some parts can go to jsons.
+
 from typing import (
     Any,
     Callable,
     Collection,
     Mapping,
+    Hashable,
     Iterable,
     Iterator,
+    Literal,
+    Optional,
+    Union,
     Sequence,
 )
 from numbers import Number
@@ -196,7 +205,7 @@ def _to_number(num: Any, to: type, recursive: bool = False) -> Any:
 
         return num
 
-    elif isinstance(num, str) and locals()[f'is_{to.__name__}'](num):
+    elif isinstance(num, str) and globals()[f'is_{to.__name__}'](num):
 
         return to(num)
 
@@ -1068,9 +1077,9 @@ def swap_dict(d: dict, force_sets: bool = False) -> dict:
 
     _d = {}
 
-    for key, vals in iteritems(d):
+    for key, vals in d.items():
 
-        vals = [vals] if type(vals) in simple_types else vals
+        vals = [vals] if type(vals) in const.SIMPLE_TYPES else vals
 
         for val in vals:
 
@@ -1078,7 +1087,7 @@ def swap_dict(d: dict, force_sets: bool = False) -> dict:
 
     if not force_sets and all(len(v) <= 1 for v in _d.values()):
 
-        _d = dict((k, list(v)[0]) for k, v in iteritems(_d) if len(v))
+        _d = dict((k, list(v)[0]) for k, v in _d.items() if len(v))
 
     return _d
 
