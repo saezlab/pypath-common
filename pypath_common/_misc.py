@@ -22,23 +22,9 @@
 
 from __future__ import annotations
 
-#TODO requires cleaning, check what functions are not used and may be removed.
-#Some parts can go to jsons.
-
-from typing import (
-    Any,
-    Callable,
-    Collection,
-    Mapping,
-    Hashable,
-    Iterable,
-    Iterator,
-    Literal,
-    Optional,
-    Union,
-    Sequence,
-)
+from typing import Any, Union, Literal, Hashable, Iterator, Optional
 from numbers import Number
+from collections.abc import Mapping, Callable, Iterable, Sequence, Collection
 import os
 import re
 import sys
@@ -49,16 +35,20 @@ import inspect
 import operator
 import textwrap
 import warnings
-import itertools
 import functools
+import itertools
 import collections
 
-import tabulate
 import psutil
+import tabulate
+
 import numpy as np
 
 import pypath_common.data as _data
 import pypath_common._constants as const
+
+# TODO requires cleaning, check what functions are not used and may be removed.
+# Some parts can go to jsons.
 
 __all__ = [
     'aacodes',
@@ -72,6 +62,7 @@ __all__ = [
     'at_least_in',
     'clean_dict',
     'combine_attrs',
+    'compr',
     'console',
     'decode',
     'del_empty',
@@ -90,10 +81,14 @@ __all__ = [
     'eq',
     'filtr',
     'first',
+    'first_value',
     'flat_list',
     'float_or_nan',
+    'format_bytes',
     'get',
     'get_args',
+    'identity',
+    'ignore_unhashable',
     'igraph_graphics_attrs',
     'is_float',
     'is_int',
@@ -101,6 +96,7 @@ __all__ = [
     'jaccard_index',
     'join_dicts',
     'latex_table',
+    'log_memory_usage',
     'match',
     'maybe_in_dict',
     'md5',
@@ -114,7 +110,9 @@ __all__ = [
     'n_unique_foreach',
     'n_unique_total',
     'negate',
+    'nest',
     'none_or_len',
+    'not_none',
     'paginate',
     'pmod_bel',
     'pmod_bel_to_other',
@@ -123,6 +121,7 @@ __all__ = [
     'print_table',
     'psite_mod_types',
     'psite_mod_types2',
+    'python_memory_usage',
     'random_string',
     're_safe_groups',
     'remove_prefix',
@@ -145,8 +144,11 @@ __all__ = [
     'table_add_row_numbers',
     'table_format',
     'table_textwrap',
+    'to_float',
+    'to_int',
     'to_list',
     'to_set',
+    'to_tuple',
     'try_bool',
     'try_float',
     'tsv_table',
@@ -209,7 +211,7 @@ def _to_number(num: Any, to: type, recursive: bool = False) -> Any:
 
         return to(num)
 
-    elif recursive and isinstance(num, LIST_LIKE):
+    elif recursive and isinstance(num, const.LIST_LIKE):
 
         container = type(num) if type(num) in {tuple, set} else list
 
@@ -373,6 +375,8 @@ def to_list(var: Any) -> list:
 
 def to_tuple(var):
     """
+    Convert various values to tuple.
+
     Makes sure `var` is a tuple otherwise creates a single element tuple
     out of it. If `var` is None returns empty tuple.
     """
@@ -600,7 +604,7 @@ def upper0(string: str) -> str:
 
     else:
 
-        words = string.split(' ', maxsplit=1)
+        words = string.split(' ', maxsplit = 1)
 
         if words[0] and words[0].lower() == words[0]:
 
@@ -648,7 +652,7 @@ def swap_suffix(name: str, sep: str = '_', suffixes: Optional[Mapping] = None):
 
     suffixes = suffixes or {'a': 'b', 'b': 'a'}
 
-    name_suffix = name.rsplit(sep, maxsplit=1)
+    name_suffix = name.rsplit(sep, maxsplit = 1)
 
     if len(name_suffix) == 2 and name_suffix[1] in suffixes:
 
@@ -1087,7 +1091,7 @@ def swap_dict(d: dict, force_sets: bool = False) -> dict:
 
     if not force_sets and all(len(v) <= 1 for v in _d.values()):
 
-        _d = dict((k, list(v)[0]) for k, v in _d.items() if len(v))
+        _d = {k: list(v)[0] for k, v in _d.items() if len(v)}
 
     return _d
 
@@ -1118,7 +1122,7 @@ def swap_dict_simple(d: dict[Hashable, Hashable]) -> dict:
 #      and got an empty dictionary (?)
 
 
-def join_dicts(d1, d2, _from='keys', to='values'):  # TODO
+def join_dicts(d1, d2, _from = 'keys', to = 'values'):  # TODO
     """
     Joins a pair of dictionaries.
 
@@ -1308,7 +1312,10 @@ def shared_unique(
 
     if group not in by_group:
 
-        warnings.warn(f'Group `{group}` missing from the dict of groups!')
+        warnings.warn(
+            f'Group `{group}` missing from the dict of groups!',
+            stacklevel = 2,
+        )
 
     _op = operator.sub if op == 'unique' else operator.and_
 
@@ -1346,9 +1353,9 @@ def shared_elements(by_group: dict[Hashable, set], group: str) -> set:
     """
 
     return shared_unique(
-        by_group=by_group,
-        group=group,
-        op='shared',
+        by_group = by_group,
+        group = group,
+        op = 'shared',
     )
 
 
@@ -1374,9 +1381,9 @@ def unique_elements(by_group, group):
     """
 
     return shared_unique(
-        by_group=by_group,
-        group=group,
-        op='unique',
+        by_group = by_group,
+        group = group,
+        op = 'unique',
     )
 
 
@@ -1401,7 +1408,7 @@ def n_shared_elements(by_group: dict[Hashable, set], group: str) -> int:
         between this group and at least one other group.
     """
 
-    return len(shared_elements(by_group=by_group, group=group))
+    return len(shared_elements(by_group = by_group, group = group))
 
 
 def n_unique_elements(by_group: dict[Hashable, set], group: str) -> int:
@@ -1425,7 +1432,7 @@ def n_unique_elements(by_group: dict[Hashable, set], group: str) -> int:
         this group (can not be found in any other group).
     """
 
-    return len(unique_elements(by_group=by_group, group=group))
+    return len(unique_elements(by_group = by_group, group = group))
 
 
 def shared_unique_foreach(
@@ -1454,7 +1461,13 @@ def shared_unique_foreach(
     method = len if counts else lambda x: x
 
     return {
-        label: method(shared_unique(by_group=by_group, group=label, op=op))
+        label: method(
+            shared_unique(
+                by_group = by_group,
+                group = label,
+                op = op,
+            ),
+        )
         for label in by_group.keys()
     }
 
@@ -1482,9 +1495,9 @@ def n_shared_unique_foreach(
     """
 
     return shared_unique_foreach(
-        by_group=by_group,
-        op='shared',
-        counts=True,
+        by_group = by_group,
+        op = 'shared',
+        counts = True,
     )
 
 
@@ -1501,7 +1514,7 @@ def shared_foreach(by_group: dict[Hashable, set]) -> dict[Hashable, set]:
         elements that can be found in more than one group.
     """
 
-    return shared_unique_foreach(by_group=by_group, op='shared')
+    return shared_unique_foreach(by_group = by_group, op = 'shared')
 
 
 def unique_foreach(by_group: dict[Hashable, set]) -> dict[Hashable, set]:
@@ -1517,7 +1530,7 @@ def unique_foreach(by_group: dict[Hashable, set]) -> dict[Hashable, set]:
         elements that can be found only in one group.
     """
 
-    return shared_unique_foreach(by_group=by_group, op='unique')
+    return shared_unique_foreach(by_group = by_group, op = 'unique')
 
 
 def n_shared_foreach(by_group: dict[Hashable, set]) -> dict[Hashable, int]:
@@ -1533,7 +1546,7 @@ def n_shared_foreach(by_group: dict[Hashable, set]) -> dict[Hashable, int]:
         elements that can be found in more than one group.
     """
 
-    return n_shared_unique_foreach(by_group=by_group, op='shared')
+    return n_shared_unique_foreach(by_group = by_group, op = 'shared')
 
 
 def n_unique_foreach(by_group: dict[Hashable, set]) -> dict[Hashable, int]:
@@ -1549,7 +1562,7 @@ def n_unique_foreach(by_group: dict[Hashable, set]) -> dict[Hashable, int]:
         elements that can be found only in one group.
     """
 
-    return n_shared_unique_foreach(by_group=by_group, op='unique')
+    return n_shared_unique_foreach(by_group = by_group, op = 'unique')
 
 
 def dict_union(dict_of_sets: dict[Hashable, set]) -> set:
@@ -1627,9 +1640,11 @@ def dict_expand_keys(dct: dict, depth: int = 1, front: bool = True) -> dict:
 
         new = (
             {
-                key: dict_expand_keys(sub_dct, depth=depth - 1)
+                key: dict_expand_keys(sub_dct, depth = depth - 1)
                 for key, sub_dct in new.items()
-            } if front else dict_expand_keys(new, depth=depth - 1, front=False)
+            }
+                if front else
+            dict_expand_keys(new, depth = depth - 1, front = False)
         )
 
     return new
@@ -1668,12 +1683,12 @@ def dict_collapse_keys(
         # the depth; this version ensures an even key length for the
         # tuple keys; another alterntive would be to iterate recursively
         # over the dictionary tree
-        dct = dict_collapse_keys(dct, depth=9999999)
+        dct = dict_collapse_keys(dct, depth = 9999999)
         maxdepth = max(
             len(k for k in dct.keys() if isinstance(k, tuple)),
-            default=0,
+            default = 0,
         )
-        return dict_expand_keys(dct, depth=maxdepth - depth, front=True)
+        return dict_expand_keys(dct, depth = maxdepth - depth, front = True)
 
     if not any(isinstance(val, dict) for val in dct.values()):
 
@@ -1701,7 +1716,7 @@ def dict_collapse_keys(
 
     if depth > 1:
 
-        new = dict_collapse_keys(new, depth=depth - 1)
+        new = dict_collapse_keys(new, depth = depth - 1)
 
     return new
 
@@ -1741,7 +1756,7 @@ def shared_total(by_group: dict[Hashable, set]) -> set:
         The shared elements collected into one set.
     """
 
-    return shared_unique_total(by_group=by_group, op='shared')
+    return shared_unique_total(by_group = by_group, op = 'shared')
 
 
 def unique_total(by_group: dict[Hashable, set]) -> set:
@@ -1756,7 +1771,7 @@ def unique_total(by_group: dict[Hashable, set]) -> set:
         The unique elements collected into one set.
     """
 
-    return shared_unique_total(by_group=by_group, op='unique')
+    return shared_unique_total(by_group = by_group, op = 'unique')
 
 
 def n_shared_total(by_group: dict[Hashable, set]) -> int:
@@ -1853,7 +1868,7 @@ def df_memory_usage(df, deep: bool = True) -> str:
         ('object' in dtypes or df.index._is_memory_usage_qualified()) else ''
     )
 
-    mem_usage = df.memory_usage(index=True, deep=deep).sum()
+    mem_usage = df.memory_usage(index = True, deep = deep).sum()
 
     for unit in ['bytes', 'KB', 'MB', 'GB', 'TB']:
 
@@ -1883,11 +1898,11 @@ def format_bytes(bytes: float, qualifier: str = '') -> str:
 
         if bytes < 1024.0:
 
-            return '%3.1f%s %s' % (bytes, qualifier, unit)
+            return f'{bytes:3.1f}{qualifier} {unit}'
 
         bytes /= 1024.0
 
-    return '%3.1f%s PB' % (bytes, qualifier)
+    return f'{bytes:3.1f}{qualifier} PB'
 
 
 def log_memory_usage():
@@ -1973,7 +1988,7 @@ def combine_attrs(attrs: list[Any], num_method: Callable = max) -> Any:
 
     # recursion:
     if len(attrs) > 2:
-        attrs = [attrs[0], combine_attrs(attrs[1:], num_method=num_method)]
+        attrs = [attrs[0], combine_attrs(attrs[1:], num_method = num_method)]
 
     # quick and simple cases:
     if len(attrs) == 0:
@@ -2060,7 +2075,7 @@ def combine_attrs(attrs: list[Any], num_method: Callable = max) -> Any:
         return attrs[0] + attrs[1]
 
 
-def _add_method(cls, method_name, method, signature=None, doc=None):
+def _add_method(cls, method_name, method, signature = None, doc = None):
 
     method.__name__ = method_name
 
@@ -2071,9 +2086,9 @@ def _add_method(cls, method_name, method, signature=None, doc=None):
             signature = inspect.Signature(
                 [
                     inspect.Parameter(
-                        name=param[0],
-                        kind=inspect.Parameter.POSITIONAL_OR_KEYWORD,
-                        default=(
+                        name = param[0],
+                        kind = inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                        default = (
                             param[1] if len(param) > 1 else
                             inspect.Parameter.empty
                         ),
@@ -2167,7 +2182,7 @@ def dict_str(dct: dict) -> str:
 
         return str(dct)
 
-    return ', '.join(f'{str(key)}={str(val)}' for key, val in dct.items())
+    return ', '.join(f'{str(key)} = {str(val)}' for key, val in dct.items())
 
 
 def none_or_len(value: Any) -> Optional[int]:
@@ -2223,11 +2238,11 @@ def wrap_truncate(
 
     if maxlen:
 
-        text = textwrap.shorten(text, width=maxlen)
+        text = textwrap.shorten(text, width = maxlen)
 
     if width:
 
-        text = textwrap.wrap(text, width=width)
+        text = textwrap.wrap(text, width = width)
 
     return os.linesep.join(text) if isinstance(text, const.LIST_LIKE) else text
 
@@ -2276,9 +2291,9 @@ def table_textwrap(
 
     return collections.OrderedDict(
         (
-            wrap_truncate(title, width=get_width(i), maxlen=maxlen),
+            wrap_truncate(title, width = get_width(i), maxlen = maxlen),
             [
-                wrap_truncate(cell, width=width, maxlen=maxlen)
+                wrap_truncate(cell, width = width, maxlen = maxlen)
                 for cell in column
             ],
         )
@@ -2305,7 +2320,7 @@ def table_format(
 
     if wrap:
 
-        tbl = table_textwrap(tbl, width=width, maxlen=maxlen)
+        tbl = table_textwrap(tbl, width = width, maxlen = maxlen)
 
     if lineno:
 
@@ -2315,7 +2330,7 @@ def table_format(
     tabulate_param.update(kwargs)
 
     return tabulate.tabulate(
-        zip(*tbl.values()), tbl.keys(), tablefmt=tablefmt, **tabulate_param
+        zip(*tbl.values()), tbl.keys(), tablefmt = tablefmt, **tabulate_param
     )
 
 
@@ -2335,11 +2350,11 @@ def print_table(
     sys.stdout.write(
         table_format(
             tbl,
-            width=width,
-            maxlen=maxlen,
-            tablefmt=tablefmt,
-            wrap=wrap,
-            lineno=lineno,
+            width = width,
+            maxlen = maxlen,
+            tablefmt = tablefmt,
+            wrap = wrap,
+            lineno = lineno,
             **kwargs,
         ),
     )
@@ -2362,7 +2377,7 @@ def tsv_table(
     the string.
     """
 
-    tbl = table_textwrap(tbl, width=None, maxlen=maxlen)
+    tbl = table_textwrap(tbl, width = None, maxlen = maxlen)
     tsv = []
     tsv.append('\t'.join(tbl.keys()))
     tsv.extend(['\t'.join(map(str, row)) for row in zip(*tbl.values())])
@@ -2431,8 +2446,10 @@ def latex_table(
             r'\usepackage{xltabular}',
             r'\usepackage{booktabs}',
             r'\usepackage[table]{xcolor}',
-            r'\usepackage[landscape,top=1cm,bottom=2cm,left=1cm,right=1cm]' +
-                r'{geometry}',  # noqa: E131
+            (
+                r'\usepackage[landscape,top = 1cm,bottom = 2cm,'
+                r'left = 1cm,right = 1cm]{geometry}'
+            ),
             r'\newcolumntype{L}{>{\raggedright\arraybackslash}X}',
             r'\newcolumntype{K}[1]{>{\raggedright\arraybackslash}p{#1}}',
             r'\renewcommand{\arraystretch}{1.5}',
@@ -2458,7 +2475,7 @@ def latex_table(
 
     kwargs['tablefmt'] = 'latex_%s' % ('booktabs' if booktabs else 'raw')
 
-    tbl = table_textwrap(tbl, width=None, maxlen=maxlen)
+    tbl = table_textwrap(tbl, width = None, maxlen = maxlen)
     tbl = collections.OrderedDict(
         (
             upper0(title.replace('_', ' ')),
@@ -2467,7 +2484,7 @@ def latex_table(
     )
 
     latex_table = table_format(
-        tbl=tbl, maxlen=maxlen, lineno=lineno, wrap=False, **kwargs
+        tbl = tbl, maxlen = maxlen, lineno = lineno, wrap = False, **kwargs
     )
 
     latex_table = latex_table.replace('tabular', 'xltabular')
@@ -2480,13 +2497,13 @@ def latex_table(
     if not colformat:
 
         m = recolformat.search(latex_table)
-        colformat = m.groups()[1].rsplit('r', maxsplit=1)
+        colformat = m.groups()[1].rsplit('r', maxsplit = 1)
         colformat = '{}r{}'.format(colformat[0], colformat[1].replace('l', 'L'))
 
     latex_table = recolformat.sub(r'\g<1>%s\g<3>' % colformat, latex_table)
     latex_table_head, latex_table_body = latex_table.split(
         r'\midrule',
-        maxsplit=1,
+        maxsplit = 1,
     )
     latex_table_head = os.linesep.join(
         (
@@ -2590,7 +2607,7 @@ def match(obj, condition):
     return bool(condition(obj)) if callable(condition) else eq(obj, condition)
 
 
-def filtr(obj, *args, and_or='AND', **kwargs):
+def filtr(obj, *args, and_or = 'AND', **kwargs):
     """
     Filters an iterable by simple conditions on one or more fields.
 
@@ -2635,7 +2652,7 @@ def filtr(obj, *args, and_or='AND', **kwargs):
             yield it
 
 
-def negate(value, neg=True) -> bool:
+def negate(value, neg = True) -> bool:
     """
     Negate a value.
 
@@ -2659,7 +2676,7 @@ def prefix(string: str, sep: str) -> str:
     only the first part.
     """
 
-    return first(string.split(sep, maxsplit=1))
+    return first(string.split(sep, maxsplit = 1))
 
 
 def suffix(string: str, sep: str) -> str:
@@ -2670,7 +2687,7 @@ def suffix(string: str, sep: str) -> str:
     only the last part.
     """
 
-    return first(reversed(string.rsplit(sep, maxsplit=1)))
+    return first(reversed(string.rsplit(sep, maxsplit = 1)))
 
 
 def remove_prefix(string: str, sep: str) -> str:
@@ -2682,7 +2699,7 @@ def remove_prefix(string: str, sep: str) -> str:
     """
 
     return (
-        first(reversed(string.split(sep, maxsplit=1))) if is_str(string) else
+        first(reversed(string.split(sep, maxsplit = 1))) if is_str(string) else
         string
     )
 
@@ -2740,7 +2757,7 @@ def compr(
         obj: Iterable | dict,
         apply: Callable | None = None,
         filter: Callable | None = None,
-    ) -> Iterable | dict:
+) -> Iterable | dict:
     """
     Unified interface for list, dict, set and tuple comprehensions.
 
@@ -2775,7 +2792,7 @@ def compr(
         filter
             if callable(filter) else
         to_set(filter).__contains__
-            if isinstance(filter, LIST_LIKE) else
+            if isinstance(filter, const.LIST_LIKE) else
         filter.__eq__
     )
 
@@ -2797,7 +2814,8 @@ def ignore_unhashable(func):
 
     uncached = func.__wrapped__
     attributes = functools.WRAPPER_ASSIGNMENTS + ('cache_info', 'cache_clear')
-    @functools.wraps(func, assigned=attributes)
+
+    @functools.wraps(func, assigned = attributes)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)

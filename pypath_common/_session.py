@@ -20,17 +20,26 @@
 #
 
 from typing import Union, Optional
+import os
 import sys
 import random
+import builtins
 import itertools
 import traceback
-import builtins
 
 from pypath_common import _logger, _settings
 
-__all__ = ["Session", "Logger", "session", "new_session", "log", "config"]
+__all__ = [
+    'Logger',
+    'SESSIONS',
+    'Session',
+    'config',
+    'log',
+    'new_session',
+    'session',
+]
 
-SESSIONS = globals().get("SESSIONS", {})
+SESSIONS = globals().get('SESSIONS', {})
 
 
 class Session:
@@ -75,11 +84,15 @@ class Session:
         config_dict = None if config_fname else config
 
         self.config = _settings.Settings(
-            fname=config_fname, module=self.module, _dict=config_dict, **kwargs
+            fname = config_fname,
+            module = self.module,
+            _dict = config_dict,
+            **kwargs
         )
 
         self.start_logger()
-        self.log.msg("Session `%s` started." % self.label)
+        self.log.msg('Session `%s` started.' % self.label)
+
 
     @staticmethod
     def gen_session_id(length: int = 5) -> str:
@@ -94,8 +107,9 @@ class Session:
             A random identifier of alphanumeric characters.
         """
 
-        abc = "0123456789abcdefghijklmnopqrstuvwxyz"
-        return "".join(random.choice(abc) for i in range(length))
+        abc = '0123456789abcdefghijklmnopqrstuvwxyz'
+        return ''.join(random.choice(abc) for i in range(length))
+
 
     def start_logger(self):
         """
@@ -107,12 +121,12 @@ class Session:
         self.logfile = str(
             os.getenv('PYPATH_LOG') or
             getattr(builtins, 'PYPATH_LOG', None) or
-            'pypath-%s.log' % self.label
+            'pypath-%s.log' % self.label,
         )
 
-        self.log = log.Logger(
+        self.log = _logger.Logger(
             fname = os.path.basename(self.logfile),
-            verbosity=self.log_verbosity,
+            verbosity = self.log_verbosity,
             logdir = os.path.dirname(self.logfile),
         )
 
@@ -123,19 +137,22 @@ class Session:
         """
 
         self.log.close_logfile()
-        self.log.msg("Session `%s` finished." % self.label)
+        self.log.msg('Session `%s` finished.' % self.label)
+
 
     def __repr__(self):
 
-        return "<Session %s>" % self.label
+        return '<Session %s>' % self.label
+
 
     def __del__(self):
 
-        if hasattr(self, "log"):
+        if hasattr(self, 'log'):
 
-            self.log.msg("Session `%s` finished." % self.label)
+            self.log.msg('Session `%s` finished.' % self.label)
 
-    def get(self, param, override=None):
+
+    def get(self, param, override = None):
         """
         The current value of a settings parameter.
 
@@ -148,9 +165,10 @@ class Session:
 
         Wrapper of `Settings.get()`.
         """
-        return self.config.get(param, override=override)
+        return self.config.get(param, override = override)
 
-    def setup(self, _dict=None, **kwargs):
+
+    def setup(self, _dict = None, **kwargs):
         """
         Set the values of various parameters in the settings.
 
@@ -165,6 +183,7 @@ class Session:
         """
 
         return self.config.setup(_dict, **kwargs)
+
 
     def context(self, _dict: Optional[dict] = None, **kwargs):
         """
@@ -197,21 +216,24 @@ class Logger:
 
         module = _get_module()
         self._log_name = name or self.__class__.__name__
-        self._logger = log(module=module)
+        self._logger = log(module = module)
 
-    def _log(self, msg="", level=0):
+
+    def _log(self, msg = '', level = 0):
         """
         Write a message into the logfile.
         """
 
-        self._logger.msg(msg=msg, label=self._log_name, level=level)
+        self._logger.msg(msg = msg, label = self._log_name, level = level)
 
-    def _console(self, msg=""):
+
+    def _console(self, msg = ''):
         """
         Write a message to the console and also to the logfile.
         """
 
-        self._logger.console(msg=msg, label=self._log_name)
+        self._logger.console(msg = msg, label = self._log_name)
+
 
     def _log_traceback(self, console: bool = False):
         """
@@ -229,27 +251,27 @@ class Logger:
 
             stack = traceback.extract_stack()[:-1]
 
-        trc = "Traceback (most recent call last):\n"
+        trc = 'Traceback (most recent call last):\n'
         trc_list = list(
             itertools.chain(
                 *(
-                    stack_level.strip("\n").split("\n")
+                    stack_level.strip('\n').split('\n')
                     for stack_level in traceback.format_list(stack)
                 )
-            )
+            ),
         )
 
         if exc_type is not None:
 
             trc_list.extend(
-                ("  %s" % traceback.format_exc().lstrip(trc)).split("\n")
+                ('  %s' % traceback.format_exc().lstrip(trc)).split('\n'),
             )
 
         stack_top = 0
 
         for i, line in enumerate(trc_list):
 
-            if line.strip().endswith("<module>"):
+            if line.strip().endswith('<module>'):
 
                 stack_top = i
 
@@ -282,7 +304,7 @@ def _get_module(module: Optional[str] = None, level: int = 2) -> str:
         The name of the module of the caller ``level`` frames above.
     """
 
-    return module or sys._getframe(level).f_back.f_globals["__name__"]
+    return module or sys._getframe(level).f_back.f_globals['__name__']
 
 
 def session(module: Optional[str] = None, **kwargs) -> Session:
@@ -303,7 +325,7 @@ def session(module: Optional[str] = None, **kwargs) -> Session:
 
     if module not in SESSIONS:
 
-        new_session(module=module, **kwargs)
+        new_session(module = module, **kwargs)
 
     return SESSIONS[module]
 
@@ -322,7 +344,7 @@ def log(module: Optional[str] = None) -> Logger:
 
     module = _get_module(module)
 
-    return session(module=module).log
+    return session(module = module).log
 
 
 def config(module: Optional[str] = None) -> _settings.Settings:
@@ -341,7 +363,7 @@ def config(module: Optional[str] = None) -> _settings.Settings:
 
     module = _get_module(module)
 
-    return session(module=module).config
+    return session(module = module).config
 
 
 def new_session(

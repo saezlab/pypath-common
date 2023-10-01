@@ -33,7 +33,7 @@ import contextlib
 
 import yaml
 
-__all__ = ["Settings"]
+__all__ = ['Settings']
 
 
 class Settings:
@@ -79,7 +79,7 @@ class Settings:
         """
 
         return (
-            yaml.load(self.fname, Loader=yaml.FullLoader)
+            yaml.load(self.fname, Loader = yaml.FullLoader)
             if self.fname and os.path.exists(self.fname)
             else {}
         )
@@ -105,7 +105,7 @@ class Settings:
 
         if mod_dir:
 
-            return os.path.join(mod_dir, "data")
+            return os.path.join(mod_dir, 'data')
 
     def _config_from_module(self):
 
@@ -113,7 +113,7 @@ class Settings:
 
         if not self.fname and datadir:
 
-            module_fname = os.path.join(datadir, "settings.yaml")
+            module_fname = os.path.join(datadir, 'settings.yaml')
 
             if os.path.exists(module_fname):
 
@@ -128,25 +128,25 @@ class Settings:
         self._context_settings = []
 
         from_config = self.config_file_contents()
-        in_datadir = from_config.get("in_datadir", ())
-        datadir = from_config.get("datadir", self._module_datadir) or "data"
+        in_datadir = from_config.get('in_datadir', ())
+        datadir = from_config.get('datadir', self._module_datadir) or 'data'
 
         self.setup(
             {  # noqa: C402
                 k: os.path.join(datadir, val) if k in in_datadir else val
                 for k, val in from_config.items()
-            }
+            },
         )
 
         # runtime attributes
         self.setup(
-            module=self.module,
-            basedir=self._module_basedir,
+            module = self.module,
+            basedir = self._module_basedir,
         )
 
         self._defaults = MappingProxyType(self.as_dict())
 
-    def setup(self, _dict=None, **kwargs):
+    def setup(self, _dict = None, **kwargs):
         """
         Set the values of various parameters in the settings.
 
@@ -171,7 +171,7 @@ class Settings:
 
         return _dict
 
-    def get(self, param, override=None, default=None):
+    def get(self, param, override = None, default = None):
         """
         Retrieves the current value of a parameter.
 
@@ -290,7 +290,7 @@ class Settings:
 
             raise AttributeError(
                 "'%s' object has no attribute '%s'"
-                % (self.__class__.__name__, str(attr))
+                % (self.__class__.__name__, str(attr)),
             )
 
     def __dir__(self):

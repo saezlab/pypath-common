@@ -35,14 +35,7 @@ __all__ = [
     'SIMPLE_TYPES',
 ]
 
-from typing import (
-    Generator,
-    ItemsView,
-    Iterator,
-    KeysView,
-    Mapping,
-    ValuesView,
-)
+from typing import Mapping, Iterator, KeysView, Generator, ItemsView, ValuesView
 
 NO_VALUE = 'PYPATH_NO_VALUE'
 GLOM_ERROR = 'PYPATH_GLOM_ERROR'

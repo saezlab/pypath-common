@@ -24,6 +24,6 @@ def module_data(name: str) -> Any:
 
     if os.path.exists(path):
 
-        with open(path, 'r') as fp:
+        with open(path) as fp:
 
-            return yaml.load(fp.read(), Loader=yaml.FullLoader)
+            return yaml.load(fp.read(), Loader = yaml.FullLoader)

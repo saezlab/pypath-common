@@ -31,7 +31,7 @@ import textwrap
 
 import timeloop
 
-__all__ = ["new_logger", "Logger"]
+__all__ = ['new_logger', 'Logger']
 
 
 _log_flush_timeloop = timeloop.Timeloop()
@@ -64,17 +64,17 @@ def new_logger(
     """
 
     # TODO: module name should not come from settings!
-    name = name or settings.get("module_name")
-    logdir = logdir or "%s_log" % name
+    name = name or settings.get('module_name')
+    logdir = logdir or '%s_log' % name
 
     return Logger(
-        fname="%s__%s.log"
+        fname = '%s__%s.log'
         % (
             name,
-            Logger.timestamp().replace(" ", "_").replace(":", "."),
+            Logger.timestamp().replace(' ', '_').replace(':', '.'),
         ),
-        verbosity=0,
-        logdir=logdir,
+        verbosity = 0,
+        logdir = logdir,
         **kwargs,
     )
 
@@ -115,42 +115,42 @@ class Logger:
         """
 
         @_log_flush_timeloop.job(
-            interval=datetime.timedelta(
-                seconds=settings.get("log_flush_interval")
-            )
+            interval = datetime.timedelta(
+                seconds = settings.get('log_flush_interval'),
+            ),
         )
         def _flush():
 
             self.flush()
 
-        _log_flush_timeloop.start(block=False)
+        _log_flush_timeloop.start(block = False)
 
         self.wrapper = textwrap.TextWrapper(
-            width=max_width,
-            subsequent_indent=" " * 22,
-            break_long_words=False,
+            width = max_width,
+            subsequent_indent = ' ' * 22,
+            break_long_words = False,
         )
         self.logdir = self.get_logdir(logdir)
         self.fname = os.path.join(self.logdir, fname)
         self.verbosity = (
             verbosity
             if verbosity is not None
-            else settings.get("log_verbosity")
+            else settings.get('log_verbosity')
         )
         self.console_level = (
             console_level
             if console_level is not None
-            else settings.get("console_verbosity")
+            else settings.get('console_verbosity')
         )
         self.open_logfile()
 
         # sending some greetings
-        self.msg("Welcome!")
-        self.msg("Logger started, logging into `%s`." % self.fname)
+        self.msg('Welcome!')
+        self.msg('Logger started, logging into `%s`.' % self.fname)
 
     def msg(
         self,
-        msg: str = "",
+        msg: str = '',
         label: Optional[str] = None,
         level: int = 0,
         wrap: bool = True,
@@ -174,37 +174,37 @@ class Logger:
 
         if level <= self.verbosity:
 
-            msg = self.label_message(msg, label=label)
+            msg = self.label_message(msg, label = label)
             msg = self.wrapper.fill(msg) if wrap else msg
             msg = self.timestamp_message(msg)
-            self.fp.write(msg.encode("utf8", errors="replace"))
+            self.fp.write(msg.encode('utf8', errors = 'replace'))
 
         if level <= self.console_level:
 
             self._console(msg)
 
-    def label_message(self, msg, label=None):
+    def label_message(self, msg, label = None):
         """
         Adds a label in front of the message.
         """
 
-        label = "[%s] " % label if label else ""
+        label = '[%s] ' % label if label else ''
 
-        return f"{label}{msg}"
+        return f'{label}{msg}'
 
     def timestamp_message(self, msg):
         """
         Adds a timestamp in front of the message.
         """
 
-        return f"[{self.timestamp()}] {msg}\n"
+        return f'[{self.timestamp()}] {msg}\n'
 
     def _console(self, msg):
 
         sys.stdout.write(msg)
         sys.stdout.flush()
 
-    def console(self, msg: str = "", label: Optional[str] = None):
+    def console(self, msg: str = '', label: Optional[str] = None):
         """
         Prints a message to the console and also to the logfile.
 
@@ -217,7 +217,7 @@ class Logger:
                 e.g. the module or class.
         """
 
-        self.msg(msg=msg, label=label, level=self.console_level)
+        self.msg(msg = msg, label = label, level = self.console_level)
 
     @classmethod
     def timestamp(cls):
@@ -225,7 +225,7 @@ class Logger:
         Returns a timestamp of the current time.
         """
 
-        return cls.strftime("%Y-%m-%d %H:%M:%S")
+        return cls.strftime('%Y-%m-%d %H:%M:%S')
 
     def __del__(self):
         """
@@ -234,15 +234,15 @@ class Logger:
         Especially, shut down the timeloop and close the logfile.
         """
 
-        if hasattr(_log_flush_timeloop, "stop"):
+        if hasattr(_log_flush_timeloop, 'stop'):
 
             _log_flush_timeloop.stop()
 
-        self.msg("Logger shut down, logfile `%s` closed." % self.fname)
-        self.msg("Bye.")
+        self.msg('Logger shut down, logfile `%s` closed.' % self.fname)
+        self.msg('Bye.')
         self.close_logfile()
 
-    def get_logdir(self, dirname=None):
+    def get_logdir(self, dirname = None):
         """
         Path to the log directory.
 
@@ -250,7 +250,7 @@ class Logger:
         not exist.
         """
 
-        dirname = dirname or "%s_log" % settings.get("module_name")
+        dirname = dirname or '%s_log' % settings.get('module_name')
 
         if not os.path.exists(dirname):
             os.makedirs(dirname)
@@ -264,14 +264,14 @@ class Logger:
 
         self.close_logfile()
 
-        self.fp = open(self.fname, "wb")
+        self.fp = open(self.fname, 'wb')
 
     def close_logfile(self):
         """
         Closes the log file.
         """
 
-        if hasattr(self, "fp") and not self.fp.closed:
+        if hasattr(self, 'fp') and not self.fp.closed:
 
             self.fp.close()
 
@@ -280,7 +280,7 @@ class Logger:
         Flushes the log file.
         """
 
-        if hasattr(self, "fp") and not self.fp.closed:
+        if hasattr(self, 'fp') and not self.fp.closed:
 
             self.fp.flush()
 
@@ -295,4 +295,4 @@ class Logger:
 
     def __repr__(self):  # noqa: D105
 
-        return "Logger [%s]" % self.fname
+        return 'Logger [%s]' % self.fname
