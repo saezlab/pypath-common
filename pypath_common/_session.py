@@ -3,22 +3,20 @@
 #
 #  This file is part of the `pypath` python module
 #
-#  Copyright
-#  2014-2022
+#  Copyright 2014-2023
 #  EMBL, EMBL-EBI, Uniklinik RWTH Aachen, Heidelberg University
 #
-#  Authors: Dénes Türei (turei.denes@gmail.com)
-#           Nicolàs Palacio
-#           Sebastian Lobentanzer
-#           Erva Ulusoy
-#           Olga Ivanova
-#           Ahmet Rifaioglu
+#  Authors: see the file `README.rst`
+#  Contact: Dénes Türei (turei.denes@gmail.com)
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
-#      http://www.gnu.org/licenses/gpl-3.0.html
+#      https://www.gnu.org/licenses/gpl-3.0.html
 #
-#  Website: http://pypath.omnipathdb.org/
+#  Website: https://pypath.omnipathdb.org/
+#
+#
+#  This file is part of the `pypath` python module
 #
 
 from typing import Union, Optional
@@ -26,6 +24,7 @@ import sys
 import random
 import itertools
 import traceback
+import builtins
 
 from pypath_common import _logger, _settings
 
@@ -105,13 +104,18 @@ class Session:
         Creates a logger for this session which will be served to all modules.
         """
 
-        self.logfile = f"{self.module}-{self.label}.log"
-        self.logdir = self.logdir or "%s_log" % self.module
-        self.log = _logger.Logger(
-            fname=self.logfile,
-            logdir=self.logdir,
-            verbosity=self.log_verbosity,
+        self.logfile = str(
+            os.getenv('PYPATH_LOG') or
+            getattr(builtins, 'PYPATH_LOG', None) or
+            'pypath-%s.log' % self.label
         )
+
+        self.log = log.Logger(
+            fname = os.path.basename(self.logfile),
+            verbosity=self.log_verbosity,
+            logdir = os.path.dirname(self.logfile),
+        )
+
 
     def finish_logger(self):
         """
@@ -209,7 +213,7 @@ class Logger:
 
         self._logger.console(msg=msg, label=self._log_name)
 
-    def _log_traceback(self):
+    def _log_traceback(self, console: bool = False):
         """
         Include a traceback into the log.
         """
@@ -251,11 +255,13 @@ class Logger:
 
         trc_list = trc_list[stack_top:]
 
-        self._log(trc.strip())
+        write = self._console if console else self._log
+
+        write(trc.strip())
 
         for traceline in trc_list:
 
-            self._log(traceline)
+            write(traceline)
 
 
 def _get_module(module: Optional[str] = None, level: int = 2) -> str:

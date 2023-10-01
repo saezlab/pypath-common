@@ -1,7 +1,7 @@
 #!/usr/bin/env python
+
 #
 #  This file is part of the `pypath` python module
-#
 #  Copyright
 #  2014-2022
 #  EMBL, EMBL-EBI, Uniklinik RWTH Aachen, Heidelberg University
