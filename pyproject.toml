@@ -51,15 +51,22 @@ myst-nb = "*"
 jupyterlab = "*"
 pydata-sphinx-theme = "*"
 sphinx-remove-toctrees = "*"
-jupyter-contrib-nbextensions = { git = "https://github.com/deeenes/jupyter_contrib_nbextensions.git", branch = "master" }
-nbsphinx = { git = "https://github.com/deeenes/nbsphinx.git", branch = "timings" }
+[tool.poetry.dev-dependencies.jupyter-contrib-nbextensions]
+git = "https://github.com/deeenes/jupyter_contrib_nbextensions.git"
+branch = "master"
+[tool.poetry.dev-dependencies.nbsphinx]
+git = "https://github.com/deeenes/nbsphinx.git"
+branch = "timings"
+[tool.poetry.dev-dependencies.flake8-plugin-kwargs-spaces]
+git = "https://github.com/saezlab/flake8-kwargs-spaces.git"
+branch = "master"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/saezlab/pypath-common/issues"
 
 [tool.black]
 line-length = 80
-target-version = ['py310']
+target-version = ['py31*']
 include = '\.pyi?$'
 exclude = '''
 (
@@ -94,7 +101,12 @@ length_sort = "1"
 indent = "    "
 
 [tool.flake8]
-ignore = ["D200", "D202", "D401", "D105", "W503", "W504", "E731"]
+extend-select = ["CE101"]
+ignore = [
+  "D200", "D202", "D401", "D105",
+  "W503", "W504",
+  "E731", "E131", "E251", "E303"
+]
 per-file-ignores = [
     "docs/source/conf.py:D100",
     "tests/*:D100,D101,D102",
