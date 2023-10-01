@@ -2,29 +2,34 @@
 
 #
 #  This file is part of the `pypath` python module
-#  Contains helper functions shared by different modules.
 #
-#  Copyright
-#  2014-2022
+#  Copyright 2014-2023
 #  EMBL, EMBL-EBI, Uniklinik RWTH Aachen, Heidelberg University
 #
-#  Authors: Dénes Türei (turei.denes@gmail.com)
-#           Nicolàs Palacio
-#           Sebastian Lobentanzer
-#           Erva Ulusoy
-#           Olga Ivanova
-#           Ahmet Rifaioglu
+#  Authors: see the file `README.rst`
+#  Contact: Dénes Türei (turei.denes@gmail.com)
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
-#      http://www.gnu.org/licenses/gpl-3.0.html
+#      https://www.gnu.org/licenses/gpl-3.0.html
 #
-#  Website: http://pypath.omnipathdb.org/
+#  Website: https://pypath.omnipathdb.org/
+#
+#
+#  This file is part of the `pypath` python module
+#  Contains helper functions shared by different modules.
 #
 
-from typing import Any, Union, Literal, Hashable, Optional
+from typing import (
+    Any,
+    Callable,
+    Collection,
+    Mapping,
+    Iterable,
+    Iterator,
+    Sequence,
+)
 from numbers import Number
-from collections.abc import Mapping, Callable, Iterable, Sequence, Collection
 import os
 import re
 import sys
@@ -36,10 +41,11 @@ import operator
 import textwrap
 import warnings
 import itertools
+import functools
 import collections
 
 import tabulate
-
+import psutil
 import numpy as np
 
 import pypath_common.data as _data
@@ -181,6 +187,64 @@ reint = re.compile(r'\s*-?\s*[\s\d]+\s*')
 non_digit = re.compile(r'[^\d.-]+')
 
 
+def _to_number(num: Any, to: type, recursive: bool = False) -> Any:
+    """
+    Convert `num` to `to` if possible, return it unchanged otherwise.
+    """
+
+    if isinstance(num, to):
+
+        return num
+
+    elif isinstance(num, str) and locals()[f'is_{to.__name__}'](num):
+
+        return to(num)
+
+    elif recursive and isinstance(num, LIST_LIKE):
+
+        container = type(num) if type(num) in {tuple, set} else list
+
+        return container(_to_number(n, to, recursive) for n in num)
+
+    else:
+
+        try:
+
+            return to(num)
+
+        except TypeError:
+
+            return num
+
+
+def to_float(num: Any, recursive: bool = False) -> Any:
+    """
+    Convert `num` to float if possible, return it unchanged otherwise.
+
+    Args:
+        num:
+            The value to convert.
+        recursive:
+            Convert elements of iterables recursively.
+    """
+
+    return _to_number(num, float, recursive)
+
+
+def to_int(num: Any, recursive: bool = False) -> Any:
+    """
+    Convert `num` to integer if possible, return it unchanged otherwise.
+
+    Args:
+        num:
+            The value to convert.
+        recursive:
+            Convert elements of iterables recursively.
+    """
+
+    return _to_number(num, int, recursive)
+
+
 def is_float(num: str) -> bool:
     """
     Tells if a string can be converted to float.
@@ -296,6 +360,39 @@ def to_list(var: Any) -> list:
     else:
 
         return [var]
+
+
+def to_tuple(var):
+    """
+    Makes sure `var` is a tuple otherwise creates a single element tuple
+    out of it. If `var` is None returns empty tuple.
+    """
+
+    return var if isinstance(var, tuple) else tuple(to_list(var))
+
+
+def not_none(fun: Callable) -> Callable:
+    """
+    Decorator implementing `fun(var) if var is not None else None`.
+    """
+
+    def wrapper(var):
+
+        return None if var is None else fun(var)
+
+    return wrapper
+
+
+def first_value(*args: Any) -> Any:
+    """
+    Returns the first non-None value of the arguments.
+    """
+
+    for arg in args:
+
+        if arg is not None:
+
+            return arg
 
 
 # From https://twitter.com/raymondh/status/944125570534621185
@@ -971,17 +1068,17 @@ def swap_dict(d: dict, force_sets: bool = False) -> dict:
 
     _d = {}
 
-    for key, vals in d.items():
+    for key, vals in iteritems(d):
 
-        vals = [vals] if type(vals) in const.SIMPLE_TYPES else vals
+        vals = [vals] if type(vals) in simple_types else vals
 
         for val in vals:
 
             _d.setdefault(val, set()).add(key)
 
-    if all(len(v) <= 1 for v in _d.values()):
+    if not force_sets and all(len(v) <= 1 for v in _d.values()):
 
-        _d = {k: list(v)[0] for k, v in _d.items() if len(v)}
+        _d = dict((k, list(v)[0]) for k, v in iteritems(_d) if len(v))
 
     return _d
 
@@ -1757,7 +1854,42 @@ def df_memory_usage(df, deep: bool = True) -> str:
 
         mem_usage /= 1024.0
 
-    return f'{mem_usage:3.1f}{size_qualifier} PB'
+    return format_bytes(mem_usage, size_qualifier)
+
+
+def python_memory_usage() -> float:
+    """
+    Returns the memory usage of the current process in bytes.
+    """
+
+    return psutil.Process(os.getpid()).memory_info().vms
+
+
+def format_bytes(bytes: float, qualifier: str = '') -> str:
+    """
+    Pretty printed bytes with unit.
+    """
+
+    for unit in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+
+        if bytes < 1024.0:
+
+            return '%3.1f%s %s' % (bytes, qualifier, unit)
+
+        bytes /= 1024.0
+
+    return '%3.1f%s PB' % (bytes, qualifier)
+
+
+def log_memory_usage():
+    """
+    Logs the memory usage of the current process.
+    """
+
+    import pypath
+    pypath.session.log.msg(
+        f'Python memory use: {format_bytes(python_memory_usage())}',
+    )
 
 
 def sum_dicts(*args: Iterable[dict]) -> dict[Hashable, float]:
@@ -2577,3 +2709,94 @@ def decode(string: Any, *args, **kwargs) -> Any:
         string = string.decode(*args, **kwargs)
 
     return string
+
+
+def identity(obj: Any) -> Any:
+    """
+    Do nothing, returns the object unchanged.
+    """
+
+    return obj
+
+
+def nest(*funcs: Callable) -> Callable:
+    """
+    Nest multiple functions into a single function.
+    """
+
+    return lambda x: functools.reduce(lambda x, f: f(x), (x,) + funcs)
+
+
+def compr(
+        obj: Iterable | dict,
+        apply: Callable | None = None,
+        filter: Callable | None = None,
+    ) -> Iterable | dict:
+    """
+    Unified interface for list, dict, set and tuple comprehensions.
+
+    Args:
+        obj:
+            An iterable, a dict or a set or a tuple.
+        apply:
+            A function to apply to each element of the iterable or dict.
+        filter:
+            A function to filter elements of the iterable or dict.
+            For filtering by equality or incidence, provide a simple
+            object or an array.
+
+    Returns:
+        Same type as the input: a list, a dict or a set or a tuple.
+    """
+
+    _type = (
+        dict
+            if isinstance(obj, Mapping) else
+        type(obj)
+            if isinstance(obj, Iterable) and not isinstance(obj, Iterator) else
+        list
+    )
+
+    apply = apply or identity
+    extract = (lambda x: x[1]) if _type == dict else identity
+    process = nest(extract, apply)
+    insert = (lambda x: (x[0], process(x))) if _type == dict else process
+
+    filter = (
+        filter
+            if callable(filter) else
+        to_set(filter).__contains__
+            if isinstance(filter, LIST_LIKE) else
+        filter.__eq__
+    )
+
+    filter = nest(extract, filter)
+    obj = obj.items() if _type == dict else obj
+
+    return _type(insert(it) for it in obj if filter(it))
+
+
+def ignore_unhashable(func):
+    """
+    Decorator to ignore unhashable values.
+
+    This is useful when using `lru_cache` on functions with optionally
+    unhashable arguments.
+
+    Based on https://stackoverflow.com/a/64111268/854988.
+    """
+
+    uncached = func.__wrapped__
+    attributes = functools.WRAPPER_ASSIGNMENTS + ('cache_info', 'cache_clear')
+    @functools.wraps(func, assigned=attributes)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except TypeError as error:
+            if 'unhashable type' in str(error):
+                return uncached(*args, **kwargs)
+            raise
+
+    wrapper.__uncached__ = uncached
+
+    return wrapper

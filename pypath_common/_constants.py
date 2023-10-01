@@ -35,7 +35,15 @@ __all__ = [
     'SIMPLE_TYPES',
 ]
 
-from typing import Union
+from typing import (
+    Generator,
+    ItemsView,
+    Iterator,
+    KeysView,
+    Mapping,
+    ValuesView,
+    Union,
+)
 
 NO_VALUE = 'PYPATH_NO_VALUE'
 GLOM_ERROR = 'PYPATH_GLOM_ERROR'
@@ -48,4 +56,14 @@ BOOLEAN_VALUES = BOOLEAN_TRUE.union(BOOLEAN_FALSE)
 SIMPLE_TYPES = Union[int, float, str, bytes, bool, type(None)]
 NUMERIC_TYPES = Union[int, float]
 CHAR_TYPES = Union[str, bytes]
-LIST_LIKE = Union[tuple, set, list]
+LIST_LIKE = (
+    list,
+    set,
+    tuple,
+    Generator,
+    ItemsView,
+    Iterator,
+    KeysView,
+    Mapping,
+    ValuesView,
+)

@@ -1,4 +1,6 @@
-import pypath_common
+from pypath_common import _session
+
+__all__ = ['TestSession']
 
 
 class TestSession:
@@ -7,4 +9,4 @@ class TestSession:
         This is a stupid test, just wanna have it here as a placeholder.
         """
 
-        assert len(pypath_common.Session.gen_session_id(10)) == 10
+        assert len(_session.Session.gen_session_id(10)) == 10
