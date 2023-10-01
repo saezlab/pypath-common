@@ -75,7 +75,11 @@ repos:
     rev: 1.2.3
     hooks:
     -   id: Flake8-pyproject
-        additional_dependencies: [flake8-docstrings, flake8-comprehensions, flake8-bugbear]
+        additional_dependencies:
+        -   flake8-docstrings
+        -   flake8-comprehensions
+        -   flake8-bugbear
+        -   git+https://github.com/saezlab/flake8-kwargs-spaces.git
 -   repo: https://github.com/rstcheck/rstcheck
     rev: v6.1.2
     hooks:
