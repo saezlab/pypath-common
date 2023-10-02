@@ -27,7 +27,7 @@ import builtins
 import itertools
 import traceback
 
-from pypath_common import _logger, _settings
+from pypath_common import _logger, _settings, _misc
 
 __all__ = [
     'Logger',
@@ -51,7 +51,7 @@ class Session:
         self,
         module: Optional[str] = None,
         label: Optional[str] = None,
-        log_verbosity: int = 0,
+        log_verbosity: Optional[int] = None,
         logdir: Optional[str] = None,
         config: Optional[Union[dict, str]] = None,
         **kwargs,
@@ -77,7 +77,6 @@ class Session:
 
         self.module = _get_module(module)
         self.label = label or self.gen_session_id()
-        self.log_verbosity = log_verbosity
         self.logdir = logdir
 
         config_fname = config if isinstance(config, str) else None
@@ -88,6 +87,10 @@ class Session:
             module = self.module,
             _dict = config_dict,
             **kwargs
+        )
+        self.log_verbosity = _misc.first_value(
+            log_verbosity,
+            self.config.get('log_verbosity'),
         )
 
         self.start_logger()
