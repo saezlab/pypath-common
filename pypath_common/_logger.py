@@ -21,7 +21,7 @@
 #  Website: http://pypath.omnipathdb.org/
 #
 
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 import os
 import sys
 import time

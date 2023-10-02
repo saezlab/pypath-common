@@ -82,7 +82,7 @@ class Settings:
 
         if self.fname and os.path.exists(self.fname):
 
-            with open(self.fname, 'r') as fp:
+            with open(self.fname) as fp:
 
                 config = yaml.load(fp, Loader = yaml.FullLoader)
 

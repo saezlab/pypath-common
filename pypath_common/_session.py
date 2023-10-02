@@ -27,7 +27,7 @@ import builtins
 import itertools
 import traceback
 
-from pypath_common import _logger, _settings, _misc
+from pypath_common import _misc, _logger, _settings
 
 __all__ = [
     'Logger',
