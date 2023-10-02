@@ -69,7 +69,7 @@ class Settings:
         self.setup(_dict, **kwargs)
         self._context_settings = []
 
-    def config_file_contents(self):
+    def config_file_contents(self) -> dict:
         """
         Read the contents of the YAML config file.
 
@@ -78,11 +78,15 @@ class Settings:
             config file was not provided or does not exist.
         """
 
-        return (
-            yaml.load(self.fname, Loader = yaml.FullLoader)
-            if self.fname and os.path.exists(self.fname)
-            else {}
-        )
+        config = {}
+
+        if self.fname and os.path.exists(self.fname):
+
+            with open(self.fname, 'r') as fp:
+
+                config = yaml.load(fp, Loader = yaml.FullLoader)
+
+        return config
 
     @property
     def _module_basedir(self):
@@ -144,7 +148,7 @@ class Settings:
             basedir = self._module_basedir,
         )
 
-        self._defaults = MappingProxyType(self.as_dict())
+        self._defaults = MappingProxyType(self.as_dict)
 
     def setup(self, _dict = None, **kwargs):
         """
