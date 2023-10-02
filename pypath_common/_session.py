@@ -126,6 +126,7 @@ class Session:
 
         self.log = _logger.Logger(
             fname = os.path.basename(self.logfile),
+            settings = self.config,
             verbosity = self.log_verbosity,
             logdir = os.path.dirname(self.logfile),
         )

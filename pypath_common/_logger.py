@@ -21,7 +21,7 @@
 #  Website: http://pypath.omnipathdb.org/
 #
 
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 import os
 import sys
 import time
@@ -37,12 +37,14 @@ __all__ = ['new_logger', 'Logger']
 _log_flush_timeloop = timeloop.Timeloop()
 _log_flush_timeloop.logger.setLevel(9999)
 
-# will be removed:
-settings = None
+if TYPE_CHECKING:
+
+    from ._settings import Settings
 
 
 def new_logger(
-    name: Optional[str] = None,
+    name: str,
+    settings: 'Settings',
     logdir: Optional[str] = None,
     verbosity: Optional[int] = None,
     **kwargs,
@@ -53,6 +55,8 @@ def new_logger(
     Args:
         name : str
             Custom name for the log.
+        settings:
+            The ``Settings`` instance of the module.
         logdir : str
             Path to the directoty to store log files.
         verbosity : int
@@ -63,8 +67,6 @@ def new_logger(
         ``log.Logger`` instance.
     """
 
-    # TODO: module name should not come from settings!
-    name = name or settings.get('module_name')
     logdir = logdir or '%s_log' % name
 
     return Logger(
@@ -91,6 +93,7 @@ class Logger:
     def __init__(
         self,
         fname: str,
+        settings: 'Settings',
         verbosity: Optional[int] = None,
         console_level: Optional[int] = None,
         logdir: Optional[str] = None,
@@ -102,6 +105,8 @@ class Logger:
         Args:
             fname:
                 Log file name.
+            settings:
+                The ``Settings`` instance of the module.
             logdir:
                 Path to the directory containing the log files.
             verbosity:
@@ -125,6 +130,7 @@ class Logger:
 
         _log_flush_timeloop.start(block = False)
 
+        self.settings = settings
         self.wrapper = textwrap.TextWrapper(
             width = max_width,
             subsequent_indent = ' ' * 22,
@@ -135,12 +141,12 @@ class Logger:
         self.verbosity = (
             verbosity
             if verbosity is not None
-            else settings.get('log_verbosity')
+            else self.settings.get('log_verbosity')
         )
         self.console_level = (
             console_level
             if console_level is not None
-            else settings.get('console_verbosity')
+            else self.settings.get('console_verbosity')
         )
         self.open_logfile()
 
@@ -250,7 +256,7 @@ class Logger:
         not exist.
         """
 
-        dirname = dirname or '%s_log' % settings.get('module_name')
+        dirname = dirname or '%s_log' % self.settings.get('module_name')
 
         if not os.path.exists(dirname):
             os.makedirs(dirname)
