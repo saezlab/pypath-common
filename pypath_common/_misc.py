@@ -29,6 +29,7 @@ import os
 import re
 import sys
 import copy
+import types
 import random
 import hashlib
 import inspect
@@ -85,6 +86,7 @@ __all__ = [
     'flat_list',
     'float_or_nan',
     'format_bytes',
+    'from_module',
     'get',
     'get_args',
     'identity',
@@ -2827,3 +2829,28 @@ def ignore_unhashable(func):
     wrapper.__uncached__ = uncached
 
     return wrapper
+
+
+def from_module(what: str) -> Callable | types.ModuleType | None:
+    """
+    Access an object or submodule from a module.
+
+    Args:
+        what:
+            Path to the target in dot separated style, e.g. ``foo.bar.baz``
+            will return the ``baz`` object from ``foo.bar`` module.
+
+    Returns:
+        The requested attribute if successful, otherwise None.
+    """
+
+    mod, attr = what.rsplit('.', maxsplit = 1)
+
+    try:
+
+        _mod = __import__(mod)
+        return getattr(_mod, attr)
+
+    except ModuleNotFoundError:
+
+        return getattr(from_module(mod), attr)
