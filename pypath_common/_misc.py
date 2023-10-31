@@ -62,6 +62,7 @@ __all__ = [
     'aminoa_3_to_1_letter',
     'at_least_in',
     'clean_dict',
+    'code_to_func',
     'combine_attrs',
     'compr',
     'console',
@@ -2854,3 +2855,22 @@ def from_module(what: str) -> Callable | types.ModuleType | None:
     except ModuleNotFoundError:
 
         return getattr(from_module(mod), attr)
+
+
+def code_to_func(code: str) -> Callable:
+    """
+    Convert a Python code string to a function.
+
+    Args:
+        code:
+            Code of a function definition.
+
+    Returns:
+        The function.
+    """
+
+    bytecode = compile(code, '<string>', 'exec')
+    ns = {}
+    eval(bytecode, {}, ns)
+
+    return first(ns.values())

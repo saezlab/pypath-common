@@ -102,7 +102,6 @@ repos:
 -   repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:
-    -   id: python-no-eval
     -   id: python-use-type-annotations
     -   id: python-check-blanket-noqa
     -   id: rst-backticks
