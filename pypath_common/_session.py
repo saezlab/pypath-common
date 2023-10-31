@@ -19,6 +19,8 @@
 #  This file is part of the `pypath` python module
 #
 
+from __future__ import annotations
+
 from typing import Union, Optional
 import os
 import sys
@@ -290,7 +292,11 @@ class Logger:
             write(traceline)
 
 
-def _get_module(module: Optional[str] = None, level: int = 2) -> str:
+def _get_module(
+        module: str | None = None,
+        ignore: None | set[str] = None,
+        top: bool = False,
+) -> str:
     """
     The module some frames above.
 
@@ -301,14 +307,39 @@ def _get_module(module: Optional[str] = None, level: int = 2) -> str:
         module:
             Override the name of the module instead of getting it from
             some parent frame.
-        level:
-            How many frames above get the module from.
+        ignore:
+            Ignore these modules, keep searching for something else. By
+            default the current module and ``importlib`` are ignored.
+        top:
+            Return only the top level module, without submodules.
 
     Returns:
         The name of the module of the caller ``level`` frames above.
     """
 
-    return module or sys._getframe(level).f_back.f_globals['__name__']
+    module = module or _find_module(ignore = ignore)
+
+    if top:
+
+        module = module.split('.', maxsplit = 1)[0]
+
+    return module
+
+
+def _find_module(ignore: None | set[str]) -> str | None:
+
+    ignore = _misc.first_value(ignore, {__name__, 'importlib'})
+
+    for i in range(50):
+
+        module = sys._getframe(i).f_globals.get('__name__', None)
+
+        if (
+            module not in ignore and
+            module.split('.', maxsplit = 1)[0] not in ignore
+        ):
+
+            return module
 
 
 def session(module: Optional[str] = None, **kwargs) -> Session:
@@ -325,7 +356,7 @@ def session(module: Optional[str] = None, **kwargs) -> Session:
         The session of the module.
     """
 
-    module = _get_module(module)
+    module = _get_module(module, top = True)
 
     if module not in SESSIONS:
 
