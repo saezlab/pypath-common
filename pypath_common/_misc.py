@@ -61,6 +61,7 @@ __all__ = [
     'aminoa_1_to_3_letter',
     'aminoa_3_to_1_letter',
     'at_least_in',
+    'caller_module',
     'clean_dict',
     'code_to_func',
     'combine_attrs',
@@ -2106,6 +2107,37 @@ def _add_method(cls, method_name, method, signature = None, doc = None):
         method.__doc__ = doc
 
     setattr(cls, method_name, method)
+
+
+def caller_module(with_submodules: bool = False) -> str:
+    """
+    Name of the module indirectly calling this function.
+
+    To find the module of interest, the stack will be traversed from bottom to
+    top until a foreign module is encountered.
+
+    Args:
+        with_submodules:
+            Include submodules, or return only the name of the top level
+            module.
+
+    Returns:
+        The name of the module calling this function.
+    """
+
+    mod_top = lambda mod: mod.split('.')[0]
+    mod_of_fi = lambda fi: mod_top(fi.frame.f_globals['__name__'])
+
+    stack = inspect.stack()
+    this_module = mod_of_fi(stack[0])
+
+    for fi in stack:
+
+        mod = mod_of_fi(fi)
+
+        if mod != this_module:
+
+            return mod
 
 
 def at_least_in(n: int = 2) -> Callable:
