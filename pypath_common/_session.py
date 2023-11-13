@@ -85,7 +85,7 @@ class Session:
         config_dict = None if config_fname else config
 
         self.config = _settings.Settings(
-            fname = config_fname,
+            paths = config_fname,
             module = self.module,
             _dict = config_dict,
             **kwargs
