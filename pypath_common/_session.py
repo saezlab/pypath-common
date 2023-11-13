@@ -97,6 +97,8 @@ class Session:
 
         self.start_logger()
         self.log.msg('Session `%s` started.' % self.label)
+        self.log.msg('Config has been read from the following files:')
+        [self.log.msg(f'  - {path}') for path in self.config._parsed]
 
 
     @staticmethod
