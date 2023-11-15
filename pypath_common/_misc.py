@@ -56,6 +56,7 @@ __all__ = [
     'aacodes',
     'aaletters',
     'aanames',
+    'add_method',
     'add_to_list',
     'add_to_set',
     'amino_acids',
@@ -2081,7 +2082,10 @@ def combine_attrs(attrs: list[Any], num_method: Callable = max) -> Any:
         return attrs[0] + attrs[1]
 
 
-def _add_method(cls, method_name, method, signature = None, doc = None):
+def add_method(cls, method_name, method, signature = None, doc = None):
+    """
+    From a function create a bound method for a class.
+    """
 
     method.__name__ = method_name
 
