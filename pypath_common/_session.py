@@ -78,6 +78,7 @@ class Session:
         """
 
         self.module = _get_module(module)
+        self.module_root = _misc.module_path(self.module)
         self.label = label or self.gen_session_id()
         self.logdir = logdir
 
