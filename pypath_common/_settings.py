@@ -28,7 +28,6 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import Any, Iterable
 import os
-import sys
 import pathlib as pl
 import itertools
 import contextlib
@@ -119,12 +118,7 @@ class Settings:
 
         if self.module:
 
-            for mod in sys.modules.keys():
-
-                if mod == self.module or mod.startswith(f'{self.module}.'):
-
-                    path = pl.Path(sys.modules[mod].__file__).parts
-                    return pl.Path(*path[:-path[::-1].index(self.module)])
+            return _common.module_path(self.module)
 
 
     @property
