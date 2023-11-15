@@ -33,6 +33,7 @@ import types
 import random
 import hashlib
 import inspect
+import pathlib as pl
 import operator
 import textwrap
 import warnings
@@ -106,6 +107,7 @@ __all__ = [
     'md5',
     'merge_dicts',
     'mod_keywords',
+    'module_path',
     'n_shared_elements',
     'n_shared_foreach',
     'n_shared_total',
@@ -2138,6 +2140,19 @@ def caller_module(with_submodules: bool = False) -> str:
         if mod != this_module:
 
             return mod
+
+
+def module_path(module: str) -> pl.Path | None:
+    """
+    For a module name returns its absolute path.
+    """
+
+    for mod in sys.modules.keys():
+
+        if mod == module or mod.startswith(f'{module}.'):
+
+            path = pl.Path(sys.modules[mod].__file__).parts
+            return pl.Path(*path[:-path[::-1].index(module)])
 
 
 def at_least_in(n: int = 2) -> Callable:
