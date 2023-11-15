@@ -432,9 +432,9 @@ def unique_list(seq: Iterable) -> list:
         List of unique elements in the sequence *seq*.
 
     Examples:
-        >>> uniq_list('aba')
+        >>> unique_list('aba')
         ['a', 'b']
-        >>> uniq_list([0, 1, 2, 1, 0])
+        >>> unique_list([0, 1, 2, 1, 0])
         [0, 1, 2]
     """
 

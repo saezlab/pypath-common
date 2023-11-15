@@ -24,7 +24,6 @@ from __future__ import annotations
 from typing import Union, Optional
 import os
 import sys
-import random
 import builtins
 import itertools
 import traceback
@@ -115,8 +114,7 @@ class Session:
             A random identifier of alphanumeric characters.
         """
 
-        abc = '0123456789abcdefghijklmnopqrstuvwxyz'
-        return ''.join(random.choice(abc) for i in range(length))
+        _misc.random_string(length)
 
 
     def start_logger(self):
