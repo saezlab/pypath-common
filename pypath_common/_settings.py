@@ -90,6 +90,8 @@ class Settings:
                 self.setup(self.read(path))
 
         self._setup_datadir()
+        self._setup_cachedir()
+        self._finish_defaults()
 
 
     @staticmethod
@@ -135,6 +137,12 @@ class Settings:
     def _user_config_dir(self) -> str | None:
 
         return platformdirs.user_config_dir(self.module, self.author)
+
+
+    @property
+    def _user_cache_dir(self) -> str | None:
+
+        return platformdirs.user_cache_dir(self.module, self.author)
 
 
     @property
@@ -283,7 +291,28 @@ class Settings:
             basedir = self._module_basedir,
         )
 
+
+    def _finish_defaults(self):
+
         self._defaults = MappingProxyType(self.as_dict)
+
+
+    def _setup_cachedir(self):
+
+        cachedir = self.get('cachedir', None) or self._user_cache_dir
+        self.setup(cachedir = cachedir)
+
+        in_cachedir = {
+            'pickle_dir': 'pickles',
+        }
+
+
+        for key, default in in_cachedir.items():
+
+            self.setup({
+                key: self.get(key, None) or os.path.join(cachedir, default),
+            })
+            os.makedirs(self.get(key), exist_ok = True)
 
 
     def setup(self, _dict = None, **kwargs):
