@@ -28,10 +28,11 @@ readme = "README.rst"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-timeloop = "*"
-tabulate = "*"
 numpy = "*"
+platformdirs = "*"
 psutil = "*"
+tabulate = "*"
+timeloop = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=6.0"
