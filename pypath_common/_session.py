@@ -114,7 +114,7 @@ class Session:
             A random identifier of alphanumeric characters.
         """
 
-        _misc.random_string(length)
+        return _misc.random_string(length)
 
 
     def start_logger(self):
