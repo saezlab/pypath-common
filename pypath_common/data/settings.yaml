@@ -1,4 +1,4 @@
-# PyPath general settings
+# configuration for all pypath modules
 module_name: pypath
 progressbars: false
 
@@ -55,6 +55,9 @@ datasets:
 -   annotations
 -   intercell
 -   tf_target
+-   dorothea
+-   collectri
+-   small_molecule
 -   tf_mirna
 -   mirna_mrna
 -   lncrna_mrna
@@ -94,16 +97,21 @@ annotations_pickle: annotations.pickle
 intercell_pickle: intercell.pickle
 enz_sub_pickle: enz_sub_%u.pickle
 tf_target_pickle: tftarget.pickle
+dorothea_pickle: dorothea.pickle
+collctri_pickle: collctri.pickle
 tf_mirna_pickle: tfmirna.pickle
 mirna_mrna_pickle: mirna_mrna.pickle
 lncrna_mrna_pickle: lncrna_mrna.pickle
+small_molecule_pickle: small_molecule.pickle
 
 # Internet settings
 server_annotations_full_download: false
 mapping_use_cache: true
 mapping_uniprot_static: false
 use_intermediate_cache: true
-uniprot_uploadlists_chunk_size: 10000
+uniprot_uploadlists_chunk_size: 100000
+uniprot_idmapping_timeout: 180
+uniprot_idmapping_poll_interval: 3
 timestamp_dirs: true
 uniprot_info_maxlen: 500
 uniprot_datasheet_connect_timeout: 10
@@ -113,14 +121,17 @@ genecards_datasheet_timeout: 20
 curl_connect_timeout: 10
 curl_timeout: 120
 curl_extended_timeout: 1200
+curl_retries: 3
 user_agent: 'User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:54.0) Gecko/20110304 Firefox/54.0'
 msigdb_email: omnipathdb@gmail.com
+msigdb_version: '2023.1'
 
 # Module settings
 network_expand_complexes: false
 network_allow_loops: false
 network_keep_original_names: true
 network_pickle_cache: true
+network_load_resource_attempts: 3
 go_pickle_cache: true
 network_extra_directions: !!set
     ? PhosphoSite_noref
@@ -142,6 +153,13 @@ annot_infer_complexes: true
 annot_composite_database_name: OmniPath
   # the resource name for annotation categories
   # combined from multiple original resources
+annot_load_resource_attempts: 3
+  # number of attempts to load a resource
+  # when building the Annotations database
+
+complex_load_resource_attempts: 3
+  # number of attempts to load a resource
+  # when building the Complexes database
 
 # load small, specific categories from CellPhoneDB
   # in the intercell database
@@ -169,6 +187,9 @@ tf_target_mod: network
 tf_mirna_mod: network
 mirna_mrna_mod: network
 lncrna_mrna_mod: network
+small_molecule_mod: network
+dorothea_mod: network
+collectri_mod: network
 
 omnipath_args:
     use_omnipath: true
@@ -185,6 +206,22 @@ tf_target_args:
         ? C
         ? A
     allow_loops: true
+
+dorothea_args:
+    method: dorothea
+    levels: !!set
+        ? A
+        ? B
+        ? C
+        ? D
+    allow_loops: true
+
+collectri_args:
+    method: collectri
+    allow_loops: true
+
+small_molecule_args:
+
 
 dorothea_expand_levels: false
 
@@ -223,6 +260,15 @@ in_cachedir:
 -   trip_preprocessed
 -   hpmr_preprocessed
 
-
 in_secrets_dir:
 -   license_secret
+
+orthology_ensembl_hc: true
+orthology_ensembl_types: one2one
+orthology_ensembl: false
+orthology_homologene: false
+orthology_oma: true
+orthology_oma_rel_type:
+orthology_oma_id_type:
+orthology_oma_score:
+orthology_cache: true
