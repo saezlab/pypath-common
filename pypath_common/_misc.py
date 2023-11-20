@@ -38,6 +38,7 @@ import operator
 import textwrap
 import warnings
 import functools
+import importlib
 import itertools
 import collections
 
@@ -2146,17 +2147,31 @@ def caller_module(with_submodules: bool = False) -> str:
             return mod
 
 
-def module_path(module: str) -> pl.Path | None:
+def module_path(module: str, directory: bool = True) -> pl.Path | None:
     """
     For a module name returns its absolute path.
+
+    Args:
+        module:
+            Name of a module.
+        directory:
+            Return the directory, without the file name.
+
+    Returns:
+        Path to the module file or the directory containing the module.
     """
 
-    for mod in sys.modules.keys():
+    spec = importlib.util.find_spec(module)
 
-        if mod == module or mod.startswith(f'{module}.'):
+    if spec:
 
-            path = pl.Path(sys.modules[mod].__file__).parts
-            return pl.Path(*path[:-path[::-1].index(module)])
+        path = pl.Path(spec.origin)
+
+        if directory:
+
+            path = path.parent
+
+        return path
 
 
 def at_least_in(n: int = 2) -> Callable:
