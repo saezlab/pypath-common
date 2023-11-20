@@ -95,6 +95,7 @@ class Settings:
 
         self._setup_datadir()
         self._setup_cachedir()
+        self._setup_secretsdir()
         self._finish_defaults()
 
 
@@ -147,6 +148,12 @@ class Settings:
     def _user_cache_dir(self) -> str | None:
 
         return platformdirs.user_cache_dir(self.module, self.author)
+
+
+    @property
+    def _user_secrets_dir(self) -> str | None:
+
+        return os.path.join(self._user_config_dir, 'secrets')
 
 
     @property
@@ -329,20 +336,34 @@ class Settings:
 
     def _setup_cachedir(self):
 
-        cachedir = self.get('cachedir', None) or self._user_cache_dir
-        self.setup(cachedir = cachedir)
+        cachedir = self._setup_dir('cachedir')
 
-        in_cachedir = {
-            'pickle_dir': 'pickles',
-        }
+        if not self.get('pickle_dir'):
+
+            self.setup(pickle_dir = os.path.join(cachedir, 'pickles'))
+            os.makedirs(self.get('pickle_dir'), exist_ok = True)
 
 
-        for key, default in in_cachedir.items():
+    def _setup_secretsdir(self):
 
-            self.setup({
-                key: self.get(key, None) or os.path.join(cachedir, default),
-            })
-            os.makedirs(self.get(key), exist_ok = True)
+        self._setup_dir('secrets_dir')
+
+
+    def _setup_dir(self, key: str) -> str:
+
+        default = f'_user_{key[:-3].strip("_")}_dir'
+        path = self.get(key) or getattr(self, default)
+        self.setup({key: path})
+
+        for key in self.get(f'in_{key}', default = ()):  # noqa: B020
+
+            if not os.path.dirname(fname := self.get(key)):
+
+                self.setup({key: os.path.join(path, fname)})
+
+        os.makedirs(path, exist_ok = True)
+
+        return path
 
 
     def setup(self, _dict = None, **kwargs):
