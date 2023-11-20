@@ -28,6 +28,7 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import Any, Iterable
 import os
+import re
 import pathlib as pl
 import itertools
 import contextlib
@@ -62,6 +63,8 @@ class Settings:
         Args:
             paths:
                 Paths to one or more YAML config files, in order of priority.
+                Alternatively, it can be a one or more module names, in this
+                case the config file will be looked up in these modules.
             module:
                 Name of the module.
             _dict:
@@ -70,9 +73,10 @@ class Settings:
                 Key-value pairs to be included in the settings dict
         """
 
-        self._paths = [pl.Path(p) for p in _common.to_list(paths)]
+        self._paths = _common.to_list(paths)
         self.module = module
         self.author = author
+        self._custom_paths()
         self._read_defaults()
         self.reset_all()
         self.setup(_dict, **kwargs)
@@ -217,13 +221,16 @@ class Settings:
             extensions.
         """
 
-        directories = [
-            d for d, e in zip(
-                self._directories,
-                (wd, user, old_user, builtin),
-            )
-            if e
-        ]
+        directories = (
+            self._other_modules +
+            [
+                d for d, e in zip(
+                    self._directories,
+                    (wd, user, old_user, builtin),
+                )
+                if e
+            ]
+        )
 
         return [
             pl.Path(d) / f
@@ -231,6 +238,30 @@ class Settings:
             for f in self._fnames
             if d
         ]
+
+
+    def _custom_paths(self):
+
+        paths = []
+        modules = []
+
+        for path in self._paths:
+
+            if not os.path.isfile(path) and re.match(r'[\w\.]+', str(path)):
+
+                mod_path = _common.module_path(str(path))
+                modules.append(mod_path)
+
+                if (mod_data_path := mod_path / 'data').exists():
+
+                    modules.append(mod_data_path)
+
+            else:
+
+                paths.append(pl.Path(path))
+
+        self._paths = paths
+        self._other_modules = _common.to_list(self._other_modules) + modules
 
 
     @property
@@ -275,7 +306,6 @@ class Settings:
             override = override,
             default = self._module_datadir or 'data',
         )
-
         self.setup(
             {  # noqa: C402
                 k: os.path.join(datadir, p)
