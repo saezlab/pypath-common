@@ -83,9 +83,12 @@ class Session:
 
         config_fname = config if isinstance(config, str) else None
         config_dict = None if config_fname else config
+        kwargs['paths'] = (
+            _misc.to_list(kwargs.get('paths', [])) +
+            _misc.to_list(config_fname)
+        )
 
         self.config = _settings.Settings(
-            paths = config_fname,
             module = self.module,
             _dict = config_dict,
             **kwargs
