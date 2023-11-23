@@ -32,12 +32,15 @@ from pypath_common import _misc, _logger, _settings
 
 __all__ = [
     'Logger',
+    'ManagedLogger',
     'SESSIONS',
     'Session',
     'config',
     'log',
+    'logger',
     'new_session',
     'session',
+    'session_logger',
 ]
 
 SESSIONS = globals().get('SESSIONS', {})
@@ -99,9 +102,9 @@ class Session:
         )
 
         self.start_logger()
-        self.log.msg('Session `%s` started.' % self.label)
-        self.log.msg('Config has been read from the following files:')
-        [self.log.msg(f'  - {path}') for path in self.config._parsed]
+        self._logger.msg('Session `%s` started.' % self.label)
+        self._logger.msg('Config has been read from the following files:')
+        [self._logger.msg(f'  - {path}') for path in self.config._parsed]
 
 
     @staticmethod
@@ -133,12 +136,13 @@ class Session:
             'pypath-%s.log' % self.label,
         )
 
-        self.log = _logger.Logger(
+        self._logger = _logger.Logger(
             fname = os.path.basename(self.logfile),
             settings = self.config,
             verbosity = self.log_verbosity,
             logdir = os.path.dirname(self.logfile),
         )
+        self._managed_loggers = {}
 
 
     def finish_logger(self):
@@ -146,8 +150,8 @@ class Session:
         Close the logger.
         """
 
-        self.log.close_logfile()
-        self.log.msg('Session `%s` finished.' % self.label)
+        self._logger.msg('Session `%s` finished.' % self.label)
+        self._logger.close_logfile()
 
 
     def __repr__(self):
@@ -157,9 +161,9 @@ class Session:
 
     def __del__(self):
 
-        if hasattr(self, 'log'):
+        if hasattr(self, '_logger'):
 
-            self.log.msg('Session `%s` finished.' % self.label)
+            self._logger.msg('Session `%s` finished.' % self.label)
 
 
     def get(self, param, override = None):
@@ -209,12 +213,53 @@ class Session:
         return self.config.context(_dict, **kwargs)
 
 
+    def logger(self, name: str | None) -> Logger:
+        """
+        Access a logger with the given name.
+
+        Args:
+            name:
+                Name of the logger, this will be included in front of each
+                message from this logger. If not provided, the default logger
+                of this session will be returned.
+
+        These are loggers managed by this session instance, in contrast to
+        other loggers that are created by inheritance.
+        """
+
+        name = name or self.module
+
+        if name not in self._managed_loggers:
+
+            self._managed_loggers[name] = ManagedLogger(name = name)
+
+        return self._managed_loggers[name]
+
+
+    def log(self, msg: str = '', level: int = 0, name: str | None = None):
+        """
+        Send a log message.
+
+        Args:
+            msg:
+                Text of the message.
+            level:
+                Priority level of the message.
+            name:
+                Name of the logger, this will be included in front of each
+                message from this logger. If not provided, the default logger
+                of this session will be returned.
+        """
+
+        self.logger(name).log(msg = msg, level = level)
+
+
 class Logger:
     """
     Base class that makes logging available for its descendants.
     """
 
-    def __init__(self, name: Optional[str] = None):
+    def __init__(self, name: str | None = None, module: str | None = None):
         """
         Make this instance a logger.
 
@@ -222,11 +267,12 @@ class Logger:
             name:
                 The label of this instance that will be prepended to all
                 messages it sends to the logger.
+            module:
+                Send the messages by the logger of this module.
         """
 
-        module = _get_module()
         self._log_name = name or self.__class__.__name__
-        self._logger = log(module = module)
+        self._logger = session_logger(module = module)
 
 
     def _log(self, msg = '', level = 0):
@@ -296,6 +342,16 @@ class Logger:
             write(traceline)
 
 
+class ManagedLogger(Logger):
+    """
+    A stand alone logger that is managed by a session instance.
+    """
+
+    log = Logger._log
+    console = Logger._console
+    log_traceback = Logger._log_traceback
+
+
 def _get_module(
         module: str | None = None,
         top: bool = False,
@@ -346,7 +402,7 @@ def session(module: Optional[str] = None, **kwargs) -> Session:
     return SESSIONS[module]
 
 
-def log(module: Optional[str] = None) -> Logger:
+def session_logger(module: Optional[str] = None) -> _logger.Logger:
     """
     Get the `Logger` instance of the session.
 
@@ -358,9 +414,7 @@ def log(module: Optional[str] = None) -> Logger:
         The Logger instance of the session.
     """
 
-    module = _get_module(module)
-
-    return session(module = module).log
+    return session(module = module).logger
 
 
 def config(module: Optional[str] = None) -> _settings.Settings:
@@ -376,8 +430,6 @@ def config(module: Optional[str] = None) -> _settings.Settings:
     Returns:
         A `_settings.Settings` instance.
     """
-
-    module = _get_module(module)
 
     return session(module = module).config
 
@@ -399,3 +451,38 @@ def new_session(
     """
 
     SESSIONS[module] = Session(module, **kwargs)
+
+
+def logger(name: str, module: str | None = None) -> ManagedLogger:
+    """
+    Retrieve a logger managed by a session by its name.
+
+    Args:
+        name:
+            Name of the logger.
+        module:
+            Module the session belongs to.
+    """
+
+    return session(module).logger(name = name)
+
+
+def log(
+        msg: str = '',
+        level: int = 0,
+        name: str | None = None,
+        module: str | None = None,
+):
+    """
+    Send a log message.
+
+    Args:
+        msg:
+            Text of the message.
+        level:
+            Priority level of the message.
+        module:
+            Send the message by the logger of this module.
+    """
+
+    session(module).log(msg = msg, level = level, name = name)
