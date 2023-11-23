@@ -109,6 +109,7 @@ __all__ = [
     'md5',
     'merge_dicts',
     'mod_keywords',
+    'module_datadir',
     'module_path',
     'n_shared_elements',
     'n_shared_foreach',
@@ -2161,9 +2162,7 @@ def module_path(module: str, directory: bool = True) -> pl.Path | None:
         Path to the module file or the directory containing the module.
     """
 
-    spec = importlib.util.find_spec(module)
-
-    if spec:
+    if spec := importlib.util.find_spec(module):
 
         path = pl.Path(spec.origin)
 
@@ -2172,6 +2171,29 @@ def module_path(module: str, directory: bool = True) -> pl.Path | None:
             path = path.parent
 
         return path
+
+
+def module_datadir(module: str) -> pl.Path | None:
+    """
+    For a module name returns its data directory.
+
+    Args:
+        module:
+            Name of a module.
+
+    Returns:
+        Path to the `data` or `_data` directory under the queried module, if
+        such directory exist. If both exist, the path to `data` will be
+        returned.
+    """
+
+    if path := module_path(module, directory = True):
+
+        for data in ('data', '_data'):
+
+            if (datadir := path / data).exists():
+
+                return datadir
 
 
 def at_least_in(n: int = 2) -> Callable:
