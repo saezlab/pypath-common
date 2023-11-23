@@ -298,22 +298,15 @@ class Logger:
 
 def _get_module(
         module: str | None = None,
-        ignore: None | set[str] = None,
         top: bool = False,
 ) -> str:
     """
-    The module some frames above.
-
-    Should be called from a function that is called directly from the
-    client module.
+    The first module in the call stack outside of this module.
 
     Args:
         module:
             Override the name of the module instead of getting it from
             some parent frame.
-        ignore:
-            Ignore these modules, keep searching for something else. By
-            default the current module and ``importlib`` are ignored.
         top:
             Return only the top level module, without submodules.
 
@@ -321,29 +314,13 @@ def _get_module(
         The name of the module of the caller ``level`` frames above.
     """
 
-    module = module or _find_module(ignore = ignore)
+    module = module or _misc.caller_module()
 
     if top:
 
         module = module.split('.', maxsplit = 1)[0]
 
     return module
-
-
-def _find_module(ignore: None | set[str]) -> str | None:
-
-    ignore = _misc.first_value(ignore, {__name__, 'importlib'})
-
-    for i in range(50):
-
-        module = sys._getframe(i).f_globals.get('__name__', None)
-
-        if (
-            module not in ignore and
-            module.split('.', maxsplit = 1)[0] not in ignore
-        ):
-
-            return module
 
 
 def session(module: Optional[str] = None, **kwargs) -> Session:
