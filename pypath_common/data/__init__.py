@@ -23,28 +23,10 @@
 Data shared across pypath modules.
 
 Data about resource specific vocabularies, generic data for molecular biology
-data processing, module settings. Stored in YAML or JSON.
+data processing, module settings. Stored in YAML, JSON, TSV or other formats.
+This module also supports the access to built in data in other modules.
 """
 
-from typing import Any
-import os
+from pypath_common.data._data import load, path, builtins
 
-import yaml
-
-__all__ = ['module_data']
-
-
-def module_data(name: str) -> Any:
-    """
-    Retrieve the contents of a YAML file shipped with this module.
-    """
-
-    here = os.path.dirname(os.path.abspath(__file__))
-
-    path = os.path.join(here, f'{name}.yaml')
-
-    if os.path.exists(path):
-
-        with open(path) as fp:
-
-            return yaml.load(fp.read(), Loader = yaml.FullLoader)
+__all__ = ['builtins', 'load', 'path']
