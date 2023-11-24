@@ -75,6 +75,7 @@ def new_logger(
             name,
             Logger.timestamp().replace(' ', '_').replace(':', '.'),
         ),
+        settings = settings,
         verbosity = 0,
         logdir = logdir,
         **kwargs,
