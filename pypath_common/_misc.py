@@ -2140,18 +2140,17 @@ def caller_module(with_submodules: bool = False) -> str:
 
     stack = inspect.stack()
     this_module = mod_top(mod_of_fi(stack[0]))
-    caller = this_module
 
     for fi in stack:
 
-        mod = mod_of_fi(fi)
+        mod_full = mod_of_fi(fi)
+        mod = mod_top(mod_full)
 
         if mod != this_module and mod not in forbidden:
 
-            caller = mod
-            break
+            return mod_full if with_submodules else mod
 
-    return caller if with_submodules else mod_top(caller)
+    return this_module
 
 
 def module_path(module: str, directory: bool = True) -> pl.Path | None:
