@@ -2133,19 +2133,25 @@ def caller_module(with_submodules: bool = False) -> str:
         The name of the module calling this function.
     """
 
+    forbidden = {'importlib', 'console', '__main__'}
+
     mod_top = lambda mod: mod.split('.')[0]
     mod_of_fi = lambda fi: mod_top(fi.frame.f_globals['__name__'])
 
     stack = inspect.stack()
-    this_module = mod_of_fi(stack[0])
+    this_module = mod_top(mod_of_fi(stack[0]))
+    caller = this_module
 
     for fi in stack:
 
         mod = mod_of_fi(fi)
 
-        if mod != this_module:
+        if mod != this_module and mod not in forbidden:
 
-            return mod
+            caller = mod
+            break
+
+    return caller if with_submodules else mod_top(caller)
 
 
 def module_path(module: str, directory: bool = True) -> pl.Path | None:
