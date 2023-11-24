@@ -370,11 +370,7 @@ def _get_module(
         The name of the module of the caller ``level`` frames above.
     """
 
-    module = module or _misc.caller_module()
-
-    if top:
-
-        module = module.split('.', maxsplit = 1)[0]
+    module = module or _misc.caller_module(with_submodules = not top)
 
     return module
 
