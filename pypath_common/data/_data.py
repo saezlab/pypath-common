@@ -42,7 +42,7 @@ __all__ = [
     'path',
 ]
 
-logger = _session.logger(name = 'pypath_common.data')
+_log = lambda x: _session.logger(name = 'pypath_common.data').log(x)
 
 _FORMATS = {
     'json': 'json.load',
@@ -117,7 +117,7 @@ def load(
 
             reader = _misc.from_module(reader)
 
-        logger.log(
+        _log(
             f'Loading built-in data `{label}` from module `{module}`; '
             f'path: `{_path}`.',
         )
@@ -128,9 +128,7 @@ def load(
 
     else:
 
-        logger.log(
-            f'Could not find built-in data `{label}` in module `{module}`.',
-        )
+        _log(f'Could not find built-in data `{label}` in module `{module}`.')
 
 
 def builtins(module: str | None = None) -> dict[str, str]:
