@@ -259,9 +259,11 @@ class Settings:
                 mod_path = _misc.module_path(str(path))
                 modules.append(mod_path)
 
-                if (mod_data_path := mod_path / 'data').exists():
+                for datadir in ('data', '_data'):
 
-                    modules.append(mod_data_path)
+                    if (mod_data_path := mod_path / datadir).exists():
+
+                        modules.append(mod_data_path)
 
             else:
 
