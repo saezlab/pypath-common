@@ -2134,7 +2134,7 @@ def caller_module(with_submodules: bool = False) -> str:
         The name of the module calling this function.
     """
 
-    forbidden = {'importlib', 'console', '__main__'}
+    forbidden = {'importlib', 'console', '__main__', 'code', 'IPython'}
 
     mod_top = lambda mod: mod.split('.')[0]
     mod_of_fi = lambda fi: mod_top(fi.frame.f_globals['__name__'])
@@ -2147,9 +2147,15 @@ def caller_module(with_submodules: bool = False) -> str:
         mod_full = mod_of_fi(fi)
         mod = mod_top(mod_full)
 
-        if mod != this_module and mod not in forbidden:
+        if mod != this_module:
 
-            return mod_full if with_submodules else mod
+            if mod in forbidden:
+
+                break
+
+            else:
+
+                return mod_full if with_submodules else mod
 
     return this_module
 
