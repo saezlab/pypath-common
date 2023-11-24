@@ -134,6 +134,7 @@ __all__ = [
     'random_string',
     're_safe_groups',
     'remove_prefix',
+    'remove_suffix',
     'sets_to_sorted_lists',
     'sfirst',
     'shared_elements',
@@ -2798,6 +2799,17 @@ def remove_prefix(string: str, sep: str) -> str:
         first(reversed(string.split(sep, maxsplit = 1))) if is_str(string) else
         string
     )
+
+
+def remove_suffix(string: str, sep: str) -> str:
+    """
+    Remove a string suffix.
+
+    Removes a suffix if `string` is a string and contains the separator
+    `sep`; otherwise returns the original object.
+    """
+
+    return string.rsplit(sep, maxsplit = 1)[0] if is_str(string) else string
 
 
 def maybe_in_dict(dct: dict, key: Any) -> Any:
