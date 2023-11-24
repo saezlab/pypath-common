@@ -285,9 +285,9 @@ class Settings:
     def _read_defaults(self):
 
         result = {}
-        datadir = self._module_datadir
+        datadirs = _misc.to_list(self._module_datadir) + self._other_modules
 
-        for fname in self._fnames:
+        for datadir, fname in itertools.product(datadirs, self._fnames):
 
             if module_fname := os.path.join(datadir, fname):
 
