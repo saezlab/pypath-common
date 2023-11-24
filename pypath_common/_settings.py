@@ -36,7 +36,7 @@ import contextlib
 import yaml
 import platformdirs
 
-import pypath_common._misc as _common
+import pypath_common._misc as _misc
 
 __all__ = ['Settings']
 
@@ -73,7 +73,7 @@ class Settings:
                 Key-value pairs to be included in the settings dict
         """
 
-        self._paths = _common.to_list(paths)
+        self._paths = _misc.to_list(paths)
         self.module = module
         self.author = author
         self._custom_paths()
@@ -125,7 +125,7 @@ class Settings:
 
         if self.module:
 
-            return _common.module_path(self.module)
+            return _misc.module_path(self.module)
 
 
     @property
@@ -186,7 +186,7 @@ class Settings:
         with_modname = [
             sep.join(rev((self.module, stem)))
             for stem, sep in itertools.product(self._NAME_STEMS, ('-', '_'))
-            for rev in (_common.identity, reversed)
+            for rev in (_misc.identity, reversed)
         ] if self.module else []
 
         return list(self._NAME_STEMS) + with_modname
@@ -256,7 +256,7 @@ class Settings:
 
             if not os.path.isfile(path) and re.match(r'[\w\.]+', str(path)):
 
-                mod_path = _common.module_path(str(path))
+                mod_path = _misc.module_path(str(path))
                 modules.append(mod_path)
 
                 if (mod_data_path := mod_path / 'data').exists():
@@ -268,7 +268,7 @@ class Settings:
                 paths.append(pl.Path(path))
 
         self._paths = paths
-        self._other_modules = _common.to_list(self._other_modules) + modules
+        self._other_modules = _misc.to_list(self._other_modules) + modules
 
 
     @property
