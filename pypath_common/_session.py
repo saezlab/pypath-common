@@ -372,6 +372,10 @@ def _get_module(
 
     module = module or _misc.caller_module(with_submodules = not top)
 
+    if module == 'pypath_common':
+
+        module = 'pypath'
+
     return module
 
 
