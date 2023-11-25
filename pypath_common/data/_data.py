@@ -159,7 +159,7 @@ def builtins(module: str | None = None) -> dict[str, str]:
     datadir = _misc.module_datadir(module)
 
     return {
-        (pl.Path(d) / pl.Path(f).stem).relative_to(datadir):
+        str((pl.Path(d) / pl.Path(f).stem).relative_to(datadir)):
         pl.Path(d) / f
         for d, dirs, files in os.walk(datadir)
         for f in files
