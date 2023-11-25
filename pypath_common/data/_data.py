@@ -83,7 +83,7 @@ def path(label: str, module: str | None = None) -> pl.Path | None:
 
         available = builtins(module)
         path = available.get(label, None)
-        path = path or available.get(_misc.remove_suffix(label), None)
+        path = path or available.get(_misc.remove_suffix(label, '.'), None)
 
     return path
 
