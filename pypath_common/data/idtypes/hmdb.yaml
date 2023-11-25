@@ -1,0 +1,12 @@
+hmdb: accession
+pubchem_cid: pubchem_compound
+pubchem: pubchem_compound
+phenolexplorer: phenol_explorer_compound
+cas: cas_registry_number
+formula: chemical_formula
+inchi: inchi
+inchikey: inchikey
+hmdb_name: name
+hmdb_synonym: synonyms
+smiles: smiles
+iupac: traditional_iupac

@@ -1,0 +1,14 @@
+genesymbol: gene_primary
+genesymbol-syn: gene_synonym
+hgnc: xref_hgnc
+embl: xref_embl
+entrez: xref_geneid
+geneid: xref_geneid
+refseqp: xref_refseq
+enst: xref_ensembl
+uniprot-entry: id
+protein-name: protein_name
+gene-name: gene_names
+gene-orf: gene_orf
+gene-oln: gene_oln
+ec: ec
