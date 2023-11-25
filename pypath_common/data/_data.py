@@ -32,6 +32,9 @@ from __future__ import annotations
 from typing import Any, Callable
 import os
 import pathlib as pl
+import functools
+
+import yaml
 
 import pypath_common._misc as _misc
 import pypath_common._session as _session
@@ -46,9 +49,15 @@ _log = lambda x: _session.logger(name = 'pypath_common.data').log(x)
 
 _FORMATS = {
     'json': 'json.load',
-    'yaml': 'yaml.safe_load',
+    'yaml': functools.partial(yaml.load, Loader = yaml.FullLoader),
     'csv': 'pandas.read_csv',
     'tsv': 'pandas.read_csv',
+    'xml': _misc.identity,
+    'txt': None,
+    'sql': None,
+    '': None,
+    'html': _misc.identity,
+    'ico': _misc.identity,
 }
 
 
