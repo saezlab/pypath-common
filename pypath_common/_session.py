@@ -414,7 +414,7 @@ def session_logger(module: Optional[str] = None) -> _logger.Logger:
         The Logger instance of the session.
     """
 
-    return session(module = module).logger
+    return session(module = module)._logger
 
 
 def config(module: Optional[str] = None) -> _settings.Settings:
