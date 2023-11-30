@@ -50,6 +50,7 @@ CHAR_TYPES = (str, bytes)
 LIST_LIKE = (
     list,
     set,
+    frozenset,
     tuple,
     Generator,
     ItemsView,
