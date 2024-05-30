@@ -130,17 +130,20 @@ class Session:
         Creates a logger for this session which will be served to all modules.
         """
 
+        env_var = f'{self.module.upper()}_LOG'
+
         self.logfile = str(
-            os.getenv('PYPATH_LOG') or
-            getattr(builtins, 'PYPATH_LOG', None) or
-            'pypath-%s.log' % self.label,
+            os.getenv(env_var) or
+            getattr(builtins, env_var, None) or
+            f'{self.module}-{self.label}.log',
         )
+        logdir = os.path.dirname(self.logfile) or f'{self.module}_log'
 
         self._logger = _logger.Logger(
             fname = os.path.basename(self.logfile),
             settings = self.config,
             verbosity = self.log_verbosity,
-            logdir = os.path.dirname(self.logfile),
+            logdir = logdir,
         )
         self._managed_loggers = {}
 
