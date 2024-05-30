@@ -31,6 +31,8 @@ import textwrap
 
 import timeloop
 
+from . import _misc
+
 __all__ = ['new_logger', 'Logger']
 
 
@@ -142,12 +144,12 @@ class Logger:
         self.verbosity = (
             verbosity
             if verbosity is not None
-            else self.settings.get('log_verbosity')
+            else self.settings.get('log_verbosity') or 0
         )
         self.console_level = (
             console_level
             if console_level is not None
-            else self.settings.get('console_verbosity')
+            else self.settings.get('console_verbosity') or -1
         )
         self.open_logfile()
 
@@ -257,7 +259,11 @@ class Logger:
         not exist.
         """
 
-        dirname = dirname or '%s_log' % self.settings.get('module_name')
+        dirname = (
+            dirname or
+            '%s_log' % self.settings.get('module_name') or
+            _misc.caller_module()
+        )
 
         if not os.path.exists(dirname):
             os.makedirs(dirname)
