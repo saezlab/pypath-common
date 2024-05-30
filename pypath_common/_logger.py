@@ -34,8 +34,7 @@ import timeloop
 __all__ = ['new_logger', 'Logger']
 
 
-_log_flush_timeloop = timeloop.Timeloop()
-_log_flush_timeloop.logger.setLevel(9999)
+_log_flush_timeloop = {}
 
 if TYPE_CHECKING:
 
@@ -120,17 +119,18 @@ class Logger:
                 Maximum line width (longer lines will be wrapped).
         """
 
-        @_log_flush_timeloop.job(
-            interval = datetime.timedelta(
-                seconds = settings.get('log_flush_interval'),
-            ),
-        )
+        tloop = timeloop.Timeloop()
+        tloop.logger.setLevel(9999)
+
+        flush_interval = settings.get('log_flush_interval') or 1
+
+        @tloop.job(interval = datetime.timedelta(flush_interval))
         def _flush():
 
             self.flush()
 
-        _log_flush_timeloop.start(block = False)
 
+        tloop.start(block = False)
         self.settings = settings
         self.wrapper = textwrap.TextWrapper(
             width = max_width,
