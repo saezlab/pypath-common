@@ -32,7 +32,6 @@ numpy = "*"
 platformdirs = "*"
 psutil = "*"
 tabulate = "*"
-timeloop = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=6.0"
