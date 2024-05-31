@@ -26,17 +26,12 @@ import os
 import sys
 import time
 import pydoc
-import datetime
 import textwrap
-
-import timeloop
+import threading
 
 from . import _misc
 
 __all__ = ['new_logger', 'Logger']
-
-
-_log_flush_timeloop = {}
 
 if TYPE_CHECKING:
 
@@ -121,18 +116,6 @@ class Logger:
                 Maximum line width (longer lines will be wrapped).
         """
 
-        tloop = timeloop.Timeloop()
-        tloop.logger.setLevel(9999)
-
-        flush_interval = settings.get('log_flush_interval') or 1
-
-        @tloop.job(interval = datetime.timedelta(flush_interval))
-        def _flush():
-
-            self.flush()
-
-
-        tloop.start(block = False)
         self.settings = settings
         self.wrapper = textwrap.TextWrapper(
             width = max_width,
@@ -152,6 +135,23 @@ class Logger:
             else self.settings.get('console_verbosity') or -1
         )
         self.open_logfile()
+
+        flush_interval = settings.get('log_flush_interval') or 1
+
+        def _flush(stop):
+
+            while not stop.wait(flush_interval):
+
+                self.flush()
+
+
+        self._flush_thread_kill = threading.Event()
+        self._flush_thread = threading.Thread(
+            target = _flush,
+            args = (self._flush_thread_kill,),
+            daemon = True,
+        )
+        self._flush_thread.start()
 
         # sending some greetings
         self.msg('Welcome!')
@@ -240,12 +240,8 @@ class Logger:
         """
         Clean up before destroying this instance.
 
-        Especially, shut down the timeloop and close the logfile.
+        Especially, shut down the flushing thread and close the logfile.
         """
-
-        if hasattr(_log_flush_timeloop, 'stop'):
-
-            _log_flush_timeloop.stop()
 
         self.msg('Logger shut down, logfile `%s` closed.' % self.fname)
         self.msg('Bye.')
@@ -283,6 +279,11 @@ class Logger:
         """
         Closes the log file.
         """
+
+        if kill := getattr(self, '_flush_thread_kill', False):
+
+            kill.set()
+            self._flush_thread.join()
 
         if hasattr(self, 'fp') and not self.fp.closed:
 
