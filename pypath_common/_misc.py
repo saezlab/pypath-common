@@ -85,6 +85,7 @@ __all__ = [
     'dict_sym_diff',
     'dict_union',
     'eq',
+    'ext',
     'filtr',
     'first',
     'first_value',
@@ -2985,3 +2986,19 @@ def code_to_func(code: str) -> Callable:
     eval(bytecode, {}, ns)
 
     return first(ns.values())
+
+
+def ext(path: str) -> str:
+    """
+    Extract the extension from a path or file name.
+    """
+
+    stem, ex = os.path.splitext(path.lower())
+
+    if stem.endswith('tar'):
+
+        ex = f'tar{ex}'
+
+    ex = ex.lstrip('.')
+
+    return ex
