@@ -47,7 +47,8 @@ __all__ = [
     'path',
 ]
 
-_log = lambda x: _session.logger(name = 'pypath_common.data').log(x)
+_logger = _session.logger(name = 'pypath_common.data')
+_log = _logger.log
 
 _FORMATS = {
     'json': functools.partial(
