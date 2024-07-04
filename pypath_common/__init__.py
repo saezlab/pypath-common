@@ -33,5 +33,5 @@ from pypath_common import _misc as misc  # noqa: F401
 from pypath_common import _constants as const
 from pypath_common._session import Logger, log, logger, session  # noqa: F401
 
-PYPATH_SESSION = session('pypath', paths = 'pypath_common')
+PYPATH_SESSION = session('pypath')
 pypath_log = PYPATH_SESSION.log

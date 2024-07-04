@@ -489,3 +489,6 @@ def log(
     """
 
     session(module).log(msg = msg, level = level, name = name)
+
+
+_ = session('pypath', paths = 'pypath_common')
