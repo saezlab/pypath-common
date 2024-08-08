@@ -204,8 +204,8 @@ def aaletters() -> dict[str, str]:
     return swap_dict(aacodes())
 
 
-refloat = re.compile(r'\s*-?\s*[\s\.\d]+\s*')
-reint = re.compile(r'\s*-?\s*[\s\d]+\s*')
+refloat = re.compile(r'^\s*-?\s*[\s\.\d]+\s*$')
+reint = re.compile(r'^\s*-?\s*[\s\d]+\s*$')
 non_digit = re.compile(r'[^\d.-]+')
 
 
