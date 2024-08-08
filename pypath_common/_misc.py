@@ -1922,7 +1922,7 @@ def log_memory_usage():
     """
 
     import pypath
-    pypath.session.log.msg(
+    pypath.session.log(
         f'Python memory use: {format_bytes(python_memory_usage())}',
     )
 
