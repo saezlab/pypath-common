@@ -26,8 +26,13 @@ classifiers = [
 repository = "https://github.com/saezlab/pypath-common"
 readme = "README.rst"
 
+[[tool.poetry.source]]
+name = "pypi-public"
+url = "https://pypi.org/simple"
+
 [tool.poetry.dependencies]
 python = "^3.8"
+setuptools = "*"
 numpy = "*"
 platformdirs = "*"
 psutil = "*"
