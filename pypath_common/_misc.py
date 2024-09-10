@@ -72,6 +72,7 @@ __all__ = [
     'console',
     'decode',
     'del_empty',
+    'df_dtype_to_builtin',
     'df_memory_usage',
     'dict_collapse_keys',
     'dict_counts',
@@ -1890,6 +1891,22 @@ def df_memory_usage(df, deep: bool = True) -> str:
         mem_usage /= 1024.0
 
     return format_bytes(mem_usage, size_qualifier)
+
+
+def df_dtype_to_builtin(df: "pd.DataFrame", col: str) -> type:
+    """
+    Converts pandas dtypes to builtin types.
+
+    Args:
+        df:
+            A data frame.
+        col:
+            Name of a column.
+    """
+
+    dt = df.dtypes.get(col, np.dtypes.ObjectDType())
+
+    return type(dt.type()) or Any
 
 
 def python_memory_usage() -> float:
