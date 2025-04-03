@@ -25,7 +25,7 @@ Code shared across pypath modules.
 
 __author__ = ', '.join(['Dénes Türei'])
 __maintainer__ = ', '.join(['Dénes Türei'])
-__version__ = '0.2.5'
+__version__ = '0.2.6'
 __email__ = 'turei.denes@gmail.com'
 
 from pypath_common import data
