@@ -174,12 +174,15 @@ __all__ = [
 ]
 
 
+_common_data = functools.partial(_data.load, module = 'pypath_common')
+
+
 def aacodes() -> dict[str, str]:
     """
     Mapping between single letter and three letters amino acid codes.
     """
 
-    return _data.load('aacodes')
+    return _common_data('aacodes')
 
 
 def aanames() -> dict[str, str]:
@@ -187,7 +190,7 @@ def aanames() -> dict[str, str]:
     Mapping between common names and single letter codes of amino acids.
     """
 
-    return _data.load('aanames')
+    return _common_data('aanames')
 
 
 def mod_keywords() -> dict[str, list]:
@@ -195,7 +198,7 @@ def mod_keywords() -> dict[str, list]:
     Resource specific post-translational modification name patterns.
     """
 
-    return _data.load('mod_keywords')
+    return _common_data('mod_keywords')
 
 
 def aaletters() -> dict[str, str]:
@@ -895,7 +898,7 @@ def igraph_graphics_attrs() -> dict[str, list]:
     Igraph graphics parameters for edges and vertices.
     """
 
-    return _data.load('igraph_graphics_attrs')
+    return _common_data('igraph_graphics_attrs')
 
 
 def merge_dicts(d1: dict, d2: dict) -> dict:
@@ -1218,7 +1221,7 @@ def psite_mod_types() -> list[tuple[str, str]]:
     PhosphoSite PTM type codes.
     """  # noqa: D403
 
-    return _data.load('psite_mod_types')
+    return _common_data('psite_mod_types')
 
 
 def psite_mod_types2() -> list[tuple[str, str]]:
@@ -1226,7 +1229,7 @@ def psite_mod_types2() -> list[tuple[str, str]]:
     PhosphoSite PTM type codes, version 2.
     """  # noqa: D403
 
-    return _data.load('psite_mod_types2')
+    return _common_data('psite_mod_types2')
 
 
 def pmod_bel() -> tuple[tuple[str, tuple[str]]]:
@@ -1234,7 +1237,7 @@ def pmod_bel() -> tuple[tuple[str, tuple[str]]]:
     BEL (Biological Expression Language) PTM type codes and keywords.
     """
 
-    return _data.load('pmod_bel')
+    return _common_data('pmod_bel')
 
 
 def pmod_bel_to_other() -> dict[str, tuple[str]]:
@@ -1261,7 +1264,7 @@ def amino_acids() -> tuple[tuple[str]]:
     Amino acid names, three letters and single letter codes.
     """
 
-    return _data.load('amino_acids')
+    return _common_data('amino_acids')
 
 
 def aminoa_3_to_1_letter() -> dict[str, str]:
@@ -1893,13 +1896,13 @@ def df_memory_usage(df, deep: bool = True) -> str:
     return format_bytes(mem_usage, size_qualifier)
 
 
-def df_dtype_to_builtin(df: "pd.DataFrame", col: str) -> type:
+def df_dtype_to_builtin(df, col: str) -> type:
     """
     Converts pandas dtypes to builtin types.
 
     Args:
         df:
-            A data frame.
+            A pandas data frame.
         col:
             Name of a column.
     """
