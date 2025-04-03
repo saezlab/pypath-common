@@ -159,6 +159,8 @@ __all__ = [
     'wrap_truncate',
 ]
 
+__all__.append('swap_dict')
+
 
 refloat = re.compile(r'^\s*-?\s*[\s\.\d]+\s*$')
 reint = re.compile(r'^\s*-?\s*[\s\d]+\s*$')
