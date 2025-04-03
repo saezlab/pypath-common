@@ -28,5 +28,6 @@ This module also supports the access to built in data in other modules.
 """
 
 from pypath_common.data._data import load, path, builtins
+import pypath_common.data._common_data as data
 
 __all__ = ['builtins', 'load', 'path']

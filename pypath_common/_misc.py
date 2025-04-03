@@ -47,22 +47,16 @@ import tabulate
 
 import numpy as np
 
-import pypath_common.data as _data
+from pypath_common._process import swap_dict
 import pypath_common._constants as const
 
 # TODO requires cleaning, check what functions are not used and may be removed.
 # Some parts can go to jsons.
 
 __all__ = [
-    'aacodes',
-    'aaletters',
-    'aanames',
     'add_method',
     'add_to_list',
     'add_to_set',
-    'amino_acids',
-    'aminoa_1_to_3_letter',
-    'aminoa_3_to_1_letter',
     'at_least_in',
     'caller_module',
     'clean_dict',
@@ -98,7 +92,6 @@ __all__ = [
     'get_args',
     'identity',
     'ignore_unhashable',
-    'igraph_graphics_attrs',
     'is_float',
     'is_int',
     'is_str',
@@ -110,7 +103,6 @@ __all__ = [
     'maybe_in_dict',
     'md5',
     'merge_dicts',
-    'mod_keywords',
     'module_datadir',
     'module_path',
     'n_shared_elements',
@@ -125,13 +117,8 @@ __all__ = [
     'none_or_len',
     'not_none',
     'paginate',
-    'pmod_bel',
-    'pmod_bel_to_other',
-    'pmod_other_to_bel',
     'prefix',
     'print_table',
-    'psite_mod_types',
-    'psite_mod_types2',
     'python_memory_usage',
     'random_string',
     're_safe_groups',
@@ -150,7 +137,6 @@ __all__ = [
     'sorensen_index',
     'suffix',
     'sum_dicts',
-    'swap_dict',
     'swap_dict_simple',
     'swap_suffix',
     'table_add_row_numbers',
@@ -172,40 +158,6 @@ __all__ = [
     'values',
     'wrap_truncate',
 ]
-
-
-_common_data = functools.partial(_data.load, module = 'pypath_common')
-
-
-def aacodes() -> dict[str, str]:
-    """
-    Mapping between single letter and three letters amino acid codes.
-    """
-
-    return _common_data('aacodes')
-
-
-def aanames() -> dict[str, str]:
-    """
-    Mapping between common names and single letter codes of amino acids.
-    """
-
-    return _common_data('aanames')
-
-
-def mod_keywords() -> dict[str, list]:
-    """
-    Resource specific post-translational modification name patterns.
-    """
-
-    return _common_data('mod_keywords')
-
-
-def aaletters() -> dict[str, str]:
-    """
-    Mapping between three letters and single letter amino acid codes.
-    """
-    return swap_dict(aacodes())
 
 
 refloat = re.compile(r'^\s*-?\s*[\s\.\d]+\s*$')
@@ -893,14 +845,6 @@ def md5(value: Any) -> str:
     return hashlib.md5(value).hexdigest()
 
 
-def igraph_graphics_attrs() -> dict[str, list]:
-    """
-    Igraph graphics parameters for edges and vertices.
-    """
-
-    return _common_data('igraph_graphics_attrs')
-
-
 def merge_dicts(d1: dict, d2: dict) -> dict:
     """
     Merges dictionaries recursively.
@@ -1063,54 +1007,6 @@ def dict_sym_diff(d1: dict, d2: dict) -> dict:  # XXX: Not used
     return diff
 
 
-def swap_dict(d: dict, force_sets: bool = False) -> dict:
-    """
-    Swaps a dictionary.
-
-    Interchanges the keys and values of a dictionary. If the values are
-    lists (or any iterable type) and/or not unique, each unique element
-    will be a key and values sets of the original keys of *d* (see
-    example below).
-
-    Args:
-        d:
-            Original dictionary to be swapped.
-        force_sets:
-            The values of the swapped dict should be sets
-            even if all of them have only one item.
-
-    Returns:
-        The swapped dictionary.
-
-    Examples:
-        >>> d = {'a': 1, 'b': 2}
-        >>> swap_dict(d)
-        {1: 'a', 2: 'b'}
-        >>> d = {'a': 1, 'b': 1, 'c': 2}
-        >>> swap_dict(d)
-        {1: set(['a', 'b']), 2: set(['c'])}
-        d = {'a': [1, 2, 3], 'b': [2, 3]}
-        >>> swap_dict(d)
-        {1: set(['a']), 2: set(['a', 'b']), 3: set(['a', 'b'])}
-    """
-
-    _d = {}
-
-    for key, vals in d.items():
-
-        vals = [vals] if type(vals) in const.SIMPLE_TYPES else vals
-
-        for val in vals:
-
-            _d.setdefault(val, set()).add(key)
-
-    if not force_sets and all(len(v) <= 1 for v in _d.values()):
-
-        _d = {k: list(v)[0] for k, v in _d.items() if len(v)}
-
-    return _d
-
-
 def swap_dict_simple(d: dict[Hashable, Hashable]) -> dict:
     """
     Swaps a dictionary.
@@ -1214,73 +1110,6 @@ def join_dicts(d1, d2, _from = 'keys', to = 'values'):  # TODO
         result = {k: list(v)[0] for k, v in result.items() if len(v)}
 
     return result
-
-
-def psite_mod_types() -> list[tuple[str, str]]:
-    """
-    PhosphoSite PTM type codes.
-    """  # noqa: D403
-
-    return _common_data('psite_mod_types')
-
-
-def psite_mod_types2() -> list[tuple[str, str]]:
-    """
-    PhosphoSite PTM type codes, version 2.
-    """  # noqa: D403
-
-    return _common_data('psite_mod_types2')
-
-
-def pmod_bel() -> tuple[tuple[str, tuple[str]]]:
-    """
-    BEL (Biological Expression Language) PTM type codes and keywords.
-    """
-
-    return _common_data('pmod_bel')
-
-
-def pmod_bel_to_other() -> dict[str, tuple[str]]:
-    """
-    BEL (Biological Expression Language) PTM type codes and keywords.
-    """
-
-    return dict(pmod_bel())
-
-
-def pmod_other_to_bel() -> dict[str, str]:
-    """
-    BEL (Biological Expression Language) PTM type codes and keywords.
-    """
-
-    return {
-        other_name: bel_name
-        for bel_name, other_names in pmod_bel() for other_name in other_names
-    }
-
-
-def amino_acids() -> tuple[tuple[str]]:
-    """
-    Amino acid names, three letters and single letter codes.
-    """
-
-    return _common_data('amino_acids')
-
-
-def aminoa_3_to_1_letter() -> dict[str, str]:
-    """
-    Mapping from amino acid 3 letters to single letter codes.
-    """
-
-    return {code3: code1 for name, code3, code1 in amino_acids()}
-
-
-def aminoa_1_to_3_letter() -> dict[str, str]:
-    """
-    Mapping from amino acid single letter to 3 letters codes.
-    """
-
-    return {code1: code3 for name, code3, code1 in amino_acids()}
 
 
 def paginate(lst: Collection, size: int = 10) -> list[list]:
