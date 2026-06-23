@@ -1709,9 +1709,14 @@ def df_memory_usage(df, deep: bool = True) -> str:
 
     dtypes = {str(dt) for dt in df.dtypes}
 
+    # `Index._is_memory_usage_qualified` is a method in pandas < 3 but a
+    # property (bool) in pandas >= 3; support both.
+    _imuq = df.index._is_memory_usage_qualified
+    _imuq = _imuq() if callable(_imuq) else _imuq
+
     size_qualifier = (
         '+' if
-        ('object' in dtypes or df.index._is_memory_usage_qualified()) else ''
+        ('object' in dtypes or _imuq) else ''
     )
 
     mem_usage = df.memory_usage(index = True, deep = deep).sum()
