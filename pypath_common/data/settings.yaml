@@ -40,8 +40,8 @@ default_label_types:
     protein: genesymbol
     mirna: mir-mat-name
     lncrna: lncrna-genesymbol
-    small_molecule: rxnorm
-    drug: rxnrom
+    small_molecule: pubchem
+    drug: pubchem
 small_molecule_entity_types:
 -   small_molecule
 -   drug
