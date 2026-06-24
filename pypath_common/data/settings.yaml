@@ -57,6 +57,7 @@ datasets:
 -   tf_target
 -   dorothea
 -   collectri
+-   collectri2
 -   small_molecule
 -   tf_mirna
 -   mirna_mrna
@@ -190,6 +191,7 @@ lncrna_mrna_mod: network
 small_molecule_mod: network
 dorothea_mod: network
 collectri_mod: network
+collectri2_mod: network
 
 omnipath_args:
     use_omnipath: true
@@ -218,6 +220,10 @@ dorothea_args:
 
 collectri_args:
     method: collectri
+    allow_loops: true
+
+collectri2_args:
+    method: collectri2
     allow_loops: true
 
 small_molecule_args:
